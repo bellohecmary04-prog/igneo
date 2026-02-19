@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÍGNEO - MAPA DEL MUNDO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        @font-face {
+            font-family: 'Determination';
+            src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Press Start 2P', monospace;
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .fondo-estrellas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            z-index: 0;
+        }
+
+        .estrella {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            animation: parpadear 2s infinite alternate;
+        }
+
+        @keyframes parpadear {
+            from { opacity: 0.2; }
+            to { opacity: 1; }
+        }
+
+        .particula-color {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: flotarColor 8s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes flotarColor {
+            0% { transform: translateY(0) translateX(0); opacity: 0.8; }
+            100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
+        }
+
+        .contenedor {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #000000;
+            border: 6px solid #ffffff;
+            box-shadow: 0 0 0 6px #000000, 0 0 0 12px #7f7f7f;
+            padding: 30px;
+            animation: aparecer 0.5s steps(10) forwards;
+        }
+
+        @keyframes aparecer {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffff00;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 0 #ff0000;
+        }
+
+        .linea {
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ffffff, #ffff00, #ffffff, transparent);
+            margin: 20px 0;
+            animation: moverLinea 3s infinite;
+        }
+
+        @keyframes moverLinea {
+            0% { background-position: -200px; }
+            100% { background-position: 200px; }
+        }
+
+        /* Info superior: personaje y reino actual */
+        .info-superior {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .personaje-info {
+            display: flex;
+            gap: 30px;
+        }
+
+        .personaje-info div {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .personaje-info .label {
+            color: #7f7f7f;
+            font-size: 0.6rem;
+        }
+
+        .personaje-info .valor {
+            color: #00ff00;
+            font-size: 0.9rem;
+        }
+
+        .reino-actual {
+            text-align: right;
+        }
+
+        .reino-actual .label {
+            color: #ffff00;
+            font-size: 0.7rem;
+            margin-bottom: 5px;
+        }
+
+        .reino-actual .valor {
+            color: #00ff00;
+            font-size: 1.2rem;
+        }
+
+        /* Contenedor del mapa */
+        .mapa-contenedor {
+            position: relative;
+            width: 100%;
+            margin: 30px 0;
+            border: 4px solid #7f7f7f;
+            background: #1a1a2a;
+            padding: 20px;
+        }
+
+        .mapa-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 200px);
+            gap: 15px;
+            position: relative;
+        }
+
+        /* Regiones del mapa */
+        .region {
+            position: relative;
+            border: 4px solid #7f7f7f;
+            background: #0a0a1a;
+            cursor: pointer;
+            transition: all 0.2s step-end;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .region:hover:not(.bloqueada) {
+            border-color: #ffff00;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px #ffff00;
+        }
+
+        .region.seleccionada {
+            border-color: #ffff00;
+            box-shadow: 0 0 30px #ffff00;
+            z-index: 20;
+        }
+
+        .region.bloqueada {
+            opacity: 0.4;
+            filter: grayscale(100%);
+            cursor: not-allowed;
+        }
+
+        .region.bloqueada::after {
+            content: "🔒";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            color: #ff0000;
+        }
+
+        .region-nombre {
+            color: #ffff00;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0 #000000;
+        }
+
+        .region-icono {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            animation: flotar 2s infinite alternate;
+        }
+
+        @keyframes flotar {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+
+        .region-desc {
+            color: #7f7f7f;
+            font-size: 0.6rem;
+            line-height: 1.4;
+        }
+
+        /* Posiciones específicas de las regiones */
+        .region-astralith {
+            grid-column: 1;
+            grid-row: 1;
+            background: linear-gradient(135deg, #1a1a3a, #0a0a1a);
+        }
+        .region-norum {
+            grid-column: 3;
+            grid-row: 1;
+            background: linear-gradient(135deg, #3a1a1a, #0a0a1a);
+        }
+        .region-thanatror {
+            grid-column: 2;
+            grid-row: 2;
+            background: linear-gradient(135deg, #2a1a2a, #0a0a1a);
+        }
+        .region-balnath {
+            grid-column: 1;
+            grid-row: 3;
+            background: linear-gradient(135deg, #2a2a1a, #0a0a1a);
+        }
+        .region-kaidom {
+            grid-column: 3;
+            grid-row: 3;
+            background: linear-gradient(135deg, #1a2a3a, #0a0a1a);
+        }
+
+        /* Panel de información de región */
+        .info-region {
+            margin-top: 30px;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 20px;
+            display: none;
+        }
+
+        .info-region.visible {
+            display: block;
+            animation: aparecerInfo 0.3s steps(5);
+        }
+
+        @keyframes aparecerInfo {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #7f7f7f;
+            padding-bottom: 15px;
+        }
+
+        .info-header h2 {
+            color: #ffff00;
+            font-size: 1.5rem;
+        }
+
+        .btn-cerrar {
+            background: #0a0a1a;
+            border: 3px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .btn-cerrar:hover {
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+
+        .info-contenido {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-descripcion {
+            color: white;
+            font-size: 0.8rem;
+            line-height: 1.8;
+        }
+
+        .info-puntos {
+            background: #0a0a1a;
+            border: 3px solid #7f7f7f;
+            padding: 15px;
+        }
+
+        .punto-interes {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #3f3f3f;
+            cursor: pointer;
+        }
+
+        .punto-interes:hover {
+            background: #2a2a3a;
+        }
+
+        .punto-interes:last-child {
+            border-bottom: none;
+        }
+
+        .punto-icono {
+            font-size: 1.2rem;
+            min-width: 30px;
+        }
+
+        .punto-nombre {
+            color: #00ff00;
+            font-size: 0.7rem;
+        }
+
+        .punto-tipo {
+            color: #7f7f7f;
+            font-size: 0.6rem;
+        }
+
+        /* Botón volver */
+        .btn-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto 10px;
+            padding: 15px;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 8px 8px 0 #0a0a1a;
+            transition: all 0.05s step-end;
+        }
+
+        .btn-volver:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0 #0a0a1a;
+        }
+
+        .btn-volver:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 #0a0a1a;
+        }
+
+        @media (max-width: 800px) {
+            .mapa-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(5, 150px);
+            }
+            .region-astralith { grid-column: 1; grid-row: 1; }
+            .region-norum { grid-column: 1; grid-row: 2; }
+            .region-thanatror { grid-column: 1; grid-row: 3; }
+            .region-balnath { grid-column: 1; grid-row: 4; }
+            .region-kaidom { grid-column: 1; grid-row: 5; }
+            .info-contenido { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="fondo-estrellas" id="fondo"></div>
+    <div id="particulas"></div>
+
+    <div class="contenedor">
+        <h1>MUNDO DE ÍGNEO</h1>
+        <div class="linea"></div>
+
+        <!-- Info superior -->
+        <div class="info-superior">
+            <div class="personaje-info">
+                <div>
+                    <span class="label">PERSONAJE</span>
+                    <span class="valor" id="nombre-personaje">KAELEN FENRIR</span>
+                </div>
+                <div>
+                    <span class="label">RAZA</span>
+                    <span class="valor" id="raza-personaje">EL FÉNIX</span>
+                </div>
+                <div>
+                    <span class="label">RANGO</span>
+                    <span class="valor" id="rango-personaje">RANGO IV</span>
+                </div>
+            </div>
+            <div class="reino-actual">
+                <div class="label">REINO ACTUAL</div>
+                <div class="valor" id="reino-actual">ASTRALITH-VANDERMERE</div>
+            </div>
+        </div>
+
+        <!-- Mapa interactivo -->
+        <div class="mapa-contenedor">
+            <div class="mapa-grid">
+                <!-- Astralith-Vandermere -->
+                <div class="region region-astralith" id="region-astralith" data-reino="astralith">
+                    <div class="region-icono">☁️</div>
+                    <div class="region-nombre">ASTRALITH-VANDERMERE</div>
+                    <div class="region-desc">Reino Celestial</div>
+                </div>
+
+                <!-- Norum Dominai -->
+                <div class="region region-norum" id="region-norum" data-reino="norum">
+                    <div class="region-icono">🔥</div>
+                    <div class="region-nombre">NORUM DOMINAI</div>
+                    <div class="region-desc">Reino Infernal</div>
+                </div>
+
+                <!-- Thanatror -->
+                <div class="region region-thanatror" id="region-thanatror" data-reino="thanatror">
+                    <div class="region-icono">🌑</div>
+                    <div class="region-nombre">THANATROR</div>
+                    <div class="region-desc">Reino Sombrío</div>
+                </div>
+
+                <!-- Balnath -->
+                <div class="region region-balnath" id="region-balnath" data-reino="balnath">
+                    <div class="region-icono">⛰️</div>
+                    <div class="region-nombre">BALNATH</div>
+                    <div class="region-desc">Reino de la Tierra</div>
+                </div>
+
+                <!-- Kaidom -->
+                <div class="region region-kaidom" id="region-kaidom" data-reino="kaidom">
+                    <div class="region-icono">🌊</div>
+                    <div class="region-nombre">KAIDOM</div>
+                    <div class="region-desc">Reino Acuático</div>
+                </div>
+
+                <!-- Espacios vacíos para completar grid 3x3 -->
+                <div style="grid-column: 2; grid-row: 1;"></div>
+                <div style="grid-column: 1; grid-row: 2;"></div>
+                <div style="grid-column: 3; grid-row: 2;"></div>
+                <div style="grid-column: 2; grid-row: 3;"></div>
+            </div>
+        </div>
+
+        <!-- Panel de información de región -->
+        <div class="info-region" id="info-region">
+            <div class="info-header">
+                <h2 id="info-titulo">ASTRALITH-VANDERMERE</h2>
+                <button class="btn-cerrar" onclick="cerrarInfo()">✗</button>
+            </div>
+            <div class="info-contenido">
+                <div class="info-descripcion" id="info-descripcion">
+                    Reino Celestial, donde las nubes guardan los sueños de los antiguos. 
+                    Aquí habitan las criaturas más etéreas y poderosas.
+                </div>
+                <div class="info-puntos" id="info-puntos">
+                    <!-- Puntos de interés cargados dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón volver -->
+        <button class="btn-volver" onclick="window.location.href='menu-desbloqueado.html'">
+            VOLVER AL MENÚ
+        </button>
+    </div>
+
+    <script>
+        // Generar estrellas
+        const fondo = document.getElementById('fondo');
+        for (let i = 0; i < 150; i++) {
+            const estrella = document.createElement('div');
+            estrella.className = 'estrella';
+            estrella.style.left = Math.random() * 100 + '%';
+            estrella.style.top = Math.random() * 100 + '%';
+            estrella.style.animationDelay = Math.random() * 3 + 's';
+            fondo.appendChild(estrella);
+        }
+
+        // Generar partículas arcoíris
+        const particulas = document.getElementById('particulas');
+        const colores = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff', '#ff00ff'];
+        
+        for (let i = 0; i < 50; i++) {
+            const p = document.createElement('div');
+            p.className = 'particula-color';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.background = colores[Math.floor(Math.random() * colores.length)];
+            p.style.animationDelay = Math.random() * 5 + 's';
+            p.style.animationDuration = (5 + Math.random() * 10) + 's';
+            particulas.appendChild(p);
+        }
+
+        // Datos del personaje (simulados)
+        const personajeData = {
+            nombre: 'KAELEN FENRIR',
+            raza: 'EL FÉNIX',
+            rango: 'RANGO IV',
+            reino: 'astralith' // Reino al que pertenece el personaje
+        };
+
+        // Actualizar información del personaje
+        document.getElementById('nombre-personaje').textContent = personajeData.nombre;
+        document.getElementById('raza-personaje').textContent = personajeData.raza;
+        document.getElementById('rango-personaje').textContent = personajeData.rango;
+
+        // Mapeo de nombres de reinos
+        const nombresReinos = {
+            'astralith': 'ASTRALITH-VANDERMERE',
+            'norum': 'NORUM DOMINAI',
+            'thanatror': 'THANATROR',
+            'balnath': 'BALNATH',
+            'kaidom': 'KAIDOM'
+        };
+
+        document.getElementById('reino-actual').textContent = nombresReinos[personajeData.reino];
+
+        // Descripciones de reinos
+        const descripcionesReinos = {
+            'astralith': 'Reino Celestial, donde las nubes guardan los sueños de los antiguos. Sus habitantes son criaturas de luz y sabiduría.',
+            'norum': 'Reino Infernal, donde el fuego eterno forja almas guerreras. La lava y las cenizas son el pan de cada día.',
+            'thanatror': 'Reino Sombrío, donde la muerte susurra al oído de los valientes. Nieblas eternas cubren sus bosques.',
+            'balnath': 'Reino de la Tierra, donde las montañas guardan secretos milenarios. Cuevas profundas y minerales preciosos.',
+            'kaidom': 'Reino Acuático, donde las olas susurran secretos antiguos. Ciudades submarinas y criaturas marinas.'
+        };
+
+        // Puntos de interés por reino
+        const puntosInteres = {
+            'astralith': [
+                { tipo: 'tienda', nombre: 'El Cáliz Eterno', icono: '🧪', id: 1 },
+                { tipo: 'tienda', nombre: 'Reliquias del Alba', icono: '👑', id: 2 },
+                { tipo: 'trabajo', nombre: 'Recolectar Nubes', icono: '💼', recompensa: '300 💎' },
+                { tipo: 'trabajo', nombre: 'Cazar Ángeles', icono: '💼', recompensa: '500 💎' }
+            ],
+            'norum': [
+                { tipo: 'tienda', nombre: 'El Yunque Cenizo', icono: '⚔️', id: 3 },
+                { tipo: 'tienda', nombre: 'Esencia Pura', icono: '⛓️', id: 4 },
+                { tipo: 'trabajo', nombre: 'Forjar Armas', icono: '💼', recompensa: '400 💎' },
+                { tipo: 'trabajo', nombre: 'Domar Demonios', icono: '💼', recompensa: '600 💎' }
+            ],
+            'thanatror': [
+                { tipo: 'tienda', nombre: 'El Bazar Umbrío', icono: '🧭', id: 5 },
+                { tipo: 'trabajo', nombre: 'Cazar Lobos', icono: '💼', recompensa: '500 💎' },
+                { tipo: 'trabajo', nombre: 'Investigar Ruidos', icono: '💼', recompensa: '400 💎' }
+            ],
+            'balnath': [
+                { tipo: 'tienda', nombre: 'El Yunque Cenizo', icono: '⚔️', id: 3 },
+                { tipo: 'tienda', nombre: 'Esencia Pura', icono: '⛓️', id: 4 },
+                { tipo: 'trabajo', nombre: 'Minar Minerales', icono: '💼', recompensa: '350 💎' }
+            ],
+            'kaidom': [
+                { tipo: 'tienda', nombre: 'El Cáliz Eterno', icono: '🧪', id: 1 },
+                { tipo: 'tienda', nombre: 'El Bazar Umbrío', icono: '🧭', id: 5 },
+                { tipo: 'trabajo', nombre: 'Pescar', icono: '💼', recompensa: '350 💎' }
+            ]
+        };
+
+        // Configurar regiones (bloquear las que no son del reino del personaje)
+        const regiones = document.querySelectorAll('.region');
+        regiones.forEach(region => {
+            const reino = region.dataset.reino;
+            
+            if (reino === personajeData.reino) {
+                region.classList.add('seleccionada');
+            } else {
+                region.classList.add('bloqueada');
+            }
+
+            region.addEventListener('click', () => {
+                if (reino === personajeData.reino) {
+                    mostrarInfoReino(reino);
+                } else {
+                    mostrarMensaje('NO PERTENECES A ESTE REINO', 'error');
+                }
+            });
+        });
+
+        // Mostrar información del reino
+        function mostrarInfoReino(reino) {
+            const infoPanel = document.getElementById('info-region');
+            const titulo = document.getElementById('info-titulo');
+            const descripcion = document.getElementById('info-descripcion');
+            const puntosDiv = document.getElementById('info-puntos');
+
+            titulo.textContent = nombresReinos[reino];
+            descripcion.textContent = descripcionesReinos[reino];
+
+            // Cargar puntos de interés
+            puntosDiv.innerHTML = '';
+            const puntos = puntosInteres[reino] || [];
+
+            puntos.forEach(punto => {
+                const div = document.createElement('div');
+                div.className = 'punto-interes';
+                
+                if (punto.tipo === 'tienda') {
+                    div.onclick = () => {
+                        window.location.href = `tienda-detalle.html?id=${punto.id}`;
+                    };
+                } else {
+                    div.onclick = () => {
+                        window.location.href = 'trabajos.html';
+                    };
+                }
+
+                div.innerHTML = `
+                    <span class="punto-icono">${punto.icono}</span>
+                    <div style="flex: 1;">
+                        <div class="punto-nombre">${punto.nombre}</div>
+                        <div class="punto-tipo">${punto.tipo === 'tienda' ? '🏪 TIENDA' : '💼 TRABAJO'}</div>
+                    </div>
+                    ${punto.recompensa ? `<div style="color: #ffff00;">${punto.recompensa}</div>` : ''}
+                `;
+
+                puntosDiv.appendChild(div);
+            });
+
+            infoPanel.classList.add('visible');
+        }
+
+        function cerrarInfo() {
+            document.getElementById('info-region').classList.remove('visible');
+        }
+
+        function mostrarMensaje(texto, tipo) {
+            const mensaje = document.createElement('div');
+            mensaje.className = 'mensaje ' + tipo;
+            mensaje.textContent = texto;
+            document.body.appendChild(mensaje);
+            setTimeout(() => mensaje.remove(), 3000);
+        }
+
+        // Estilo para mensajes (añadido dinámicamente)
+        const style = document.createElement('style');
+        style.textContent = `
+            .mensaje {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                padding: 30px;
+                background: #000000;
+                border-width: 6px;
+                border-style: solid;
+                z-index: 1000;
+                text-align: center;
+                line-height: 2;
+                animation: aparecerMensaje 0.2s steps(5);
+            }
+            .mensaje.error {
+                border-color: #ff0000;
+                background: #330000;
+                color: white;
+            }
+            .mensaje.exito {
+                border-color: #00ff00;
+                background: #003300;
+                color: white;
+            }
+            @keyframes aparecerMensaje {
+                from { transform: translate(-50%, -50%) scale(0); }
+                to { transform: translate(-50%, -50%) scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

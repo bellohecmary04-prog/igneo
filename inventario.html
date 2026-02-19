@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÍGNEO - INVENTARIO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        @font-face {
+            font-family: 'Determination';
+            src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Press Start 2P', monospace;
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .fondo-estrellas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            z-index: 0;
+        }
+
+        .estrella {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            animation: parpadear 2s infinite alternate;
+        }
+
+        @keyframes parpadear {
+            from { opacity: 0.2; }
+            to { opacity: 1; }
+        }
+
+        .particula-color {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: flotarColor 8s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes flotarColor {
+            0% { transform: translateY(0) translateX(0); opacity: 0.8; }
+            100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
+        }
+
+        .contenedor {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #000000;
+            border: 6px solid #ffffff;
+            box-shadow: 0 0 0 6px #000000, 0 0 0 12px #7f7f7f;
+            padding: 30px;
+            animation: aparecer 0.5s steps(10) forwards;
+        }
+
+        @keyframes aparecer {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffff00;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 0 #ff0000;
+        }
+
+        .linea {
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ffffff, #ffff00, #ffffff, transparent);
+            margin: 20px 0;
+            animation: moverLinea 3s infinite;
+        }
+
+        @keyframes moverLinea {
+            0% { background-position: -200px; }
+            100% { background-position: 200px; }
+        }
+
+        /* Info superior: saldo y estadísticas */
+        .info-superior {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .saldo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .saldo .etiqueta {
+            color: #ffff00;
+            font-size: 0.8rem;
+        }
+
+        .saldo .valor {
+            color: #00ff00;
+            font-size: 1.2rem;
+        }
+
+        .stats-equipadas {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-equipada {
+            text-align: center;
+            background: #0a0a1a;
+            border: 3px solid #7f7f7f;
+            padding: 8px 12px;
+        }
+
+        .stat-equipada .label {
+            color: #7f7f7f;
+            font-size: 0.5rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-equipada .value {
+            color: #00ff00;
+            font-size: 0.8rem;
+        }
+
+        /* Pestañas */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            flex: 1;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            padding: 15px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.05s step-end;
+        }
+
+        .tab.activo {
+            background: #2a2a3a;
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        .tab:hover {
+            border-color: #ffff00;
+        }
+
+        /* Contenido de pestañas */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.activo {
+            display: block;
+        }
+
+        /* Grid de objetos */
+        .objetos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .objeto-card {
+            background: #1a1a2a;
+            border: 3px solid #7f7f7f;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.05s step-end;
+            position: relative;
+        }
+
+        .objeto-card:hover {
+            border-color: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #2a2a3a;
+        }
+
+        .objeto-card.equipado {
+            border-color: #ffff00;
+            background: #2a2a3a;
+            box-shadow: 0 0 15px #ffff00;
+        }
+
+        .objeto-card.equipado::after {
+            content: "★";
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            color: #ffff00;
+            font-size: 1.2rem;
+            animation: girarEstrella 2s infinite linear;
+        }
+
+        @keyframes girarEstrella {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .objeto-icono {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .objeto-nombre {
+            color: #00ff00;
+            font-size: 0.7rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .objeto-info {
+            display: flex;
+            justify-content: space-between;
+            color: #7f7f7f;
+            font-size: 0.6rem;
+            margin-bottom: 10px;
+        }
+
+        .objeto-stats {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.6rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-mod {
+            color: #ffff00;
+        }
+
+        .objeto-botones {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-objeto {
+            flex: 1;
+            background: #0a0a1a;
+            border: 3px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .btn-objeto:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        .btn-objeto.equipar {
+            background: #003300;
+            border-color: #00ff00;
+        }
+
+        .btn-objeto.usar {
+            background: #330000;
+            border-color: #ff0000;
+        }
+
+        /* Modal de detalle */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #000000;
+            border: 6px solid #ffff00;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-content h2 {
+            color: #ffff00;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-detalles {
+            margin: 20px 0;
+            padding: 20px;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+        }
+
+        .modal-detalles p {
+            color: white;
+            font-size: 0.8rem;
+            line-height: 2;
+            margin-bottom: 10px;
+        }
+
+        .modal-precio {
+            color: #00ff00;
+            font-size: 1rem;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .modal-botones {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            padding: 15px;
+            cursor: pointer;
+        }
+
+        .modal-btn.vender {
+            background: #330000;
+            border-color: #ff0000;
+        }
+
+        .modal-btn.cerrar {
+            background: #0a0a1a;
+            border-color: #7f7f7f;
+        }
+
+        .modal-btn:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        /* Historial */
+        .historial-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .historial-item {
+            background: #1a1a2a;
+            border: 3px solid #7f7f7f;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .historial-nombre {
+            color: #7f7f7f;
+            font-size: 0.7rem;
+        }
+
+        .historial-fecha {
+            color: #3f3f3f;
+            font-size: 0.5rem;
+        }
+
+        /* Botón volver */
+        .btn-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto 10px;
+            padding: 15px;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 8px 8px 0 #0a0a1a;
+            transition: all 0.05s step-end;
+        }
+
+        .btn-volver:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0 #0a0a1a;
+        }
+
+        .btn-volver:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 #0a0a1a;
+        }
+
+        @media (max-width: 800px) {
+            .objetos-grid { grid-template-columns: repeat(2, 1fr); }
+            .info-superior { flex-direction: column; gap: 15px; }
+            .stats-equipadas { flex-wrap: wrap; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="fondo-estrellas" id="fondo"></div>
+    <div id="particulas"></div>
+
+    <div class="contenedor">
+        <h1>INVENTARIO</h1>
+        <div class="linea"></div>
+
+        <!-- Info superior -->
+        <div class="info-superior">
+            <div class="saldo">
+                <span class="etiqueta">CRISTALES DE ÉTER:</span>
+                <span class="valor" id="cristales">2,450 💎</span>
+            </div>
+            <div class="stats-equipadas" id="stats-equipadas">
+                <div class="stat-equipada">
+                    <div class="label">FUERZA</div>
+                    <div class="value" id="stat-fuerza">145</div>
+                </div>
+                <div class="stat-equipada">
+                    <div class="label">MAGIA</div>
+                    <div class="value" id="stat-magia">180</div>
+                </div>
+                <div class="stat-equipada">
+                    <div class="label">ESENCIA</div>
+                    <div class="value" id="stat-esencia">165</div>
+                </div>
+                <div class="stat-equipada">
+                    <div class="label">VIDA</div>
+                    <div class="value" id="stat-vida">220</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestañas -->
+        <div class="tabs">
+            <div class="tab activo" onclick="cambiarTab('disponibles')">DISPONIBLES</div>
+            <div class="tab" onclick="cambiarTab('equipados')">EQUIPADOS (3)</div>
+            <div class="tab" onclick="cambiarTab('historial')">HISTORIAL</div>
+        </div>
+
+        <!-- Contenido: Objetos disponibles -->
+        <div class="tab-content activo" id="tab-disponibles">
+            <div class="objetos-grid" id="grid-disponibles"></div>
+        </div>
+
+        <!-- Contenido: Objetos equipados -->
+        <div class="tab-content" id="tab-equipados">
+            <div class="objetos-grid" id="grid-equipados"></div>
+        </div>
+
+        <!-- Contenido: Historial de uso -->
+        <div class="tab-content" id="tab-historial">
+            <div class="historial-grid" id="grid-historial"></div>
+        </div>
+
+        <!-- Modal de detalle -->
+        <div class="modal-overlay" id="modal">
+            <div class="modal-content">
+                <h2 id="modal-titulo">Néctar de Yggdrasil</h2>
+                <div class="modal-detalles" id="modal-detalles">
+                    <p>⚔️ Fuerza: <span id="modal-fuerza">+150</span></p>
+                    <p>✨ Magia: <span id="modal-magia">+100</span></p>
+                    <p>💫 Esencia: <span id="modal-esencia">-30</span></p>
+                    <p>❤️ Vida: <span id="modal-vida">0</span></p>
+                </div>
+                <div class="modal-precio" id="modal-precio">Comprado en: 150 💎</div>
+                <div class="modal-botones">
+                    <button class="modal-btn vender" id="modal-vender">VENDER (75 💎)</button>
+                    <button class="modal-btn cerrar" onclick="cerrarModal()">CERRAR</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón volver -->
+        <button class="btn-volver" onclick="window.location.href='menu-desbloqueado.html'">
+            VOLVER AL MENÚ
+        </button>
+    </div>
+
+    <script>
+        // Generar estrellas
+        const fondo = document.getElementById('fondo');
+        for (let i = 0; i < 150; i++) {
+            const estrella = document.createElement('div');
+            estrella.className = 'estrella';
+            estrella.style.left = Math.random() * 100 + '%';
+            estrella.style.top = Math.random() * 100 + '%';
+            estrella.style.animationDelay = Math.random() * 3 + 's';
+            fondo.appendChild(estrella);
+        }
+
+        // Generar partículas arcoíris
+        const particulas = document.getElementById('particulas');
+        const colores = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff', '#ff00ff'];
+        
+        for (let i = 0; i < 50; i++) {
+            const p = document.createElement('div');
+            p.className = 'particula-color';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.background = colores[Math.floor(Math.random() * colores.length)];
+            p.style.animationDelay = Math.random() * 5 + 's';
+            p.style.animationDuration = (5 + Math.random() * 10) + 's';
+            particulas.appendChild(p);
+        }
+
+        // Datos simulados (después vendrán de Supabase)
+        const inventarioData = {
+            cristales: 2450,
+            stats: {
+                fuerza: 145,
+                magia: 180,
+                esencia: 165,
+                vida: 220
+            },
+            objetos: [
+                { 
+                    id: 1,
+                    nombre: 'Néctar de Yggdrasil', 
+                    tipo: 'Consumible',
+                    cantidad: 3, 
+                    equipado: false, 
+                    icono: '🧪',
+                    precio: 150,
+                    stats: { fuerza: 150, magia: 100, esencia: -30, vida: 0 }
+                },
+                { 
+                    id: 2,
+                    nombre: 'Espada de Hierro', 
+                    tipo: 'Equipo',
+                    cantidad: 1, 
+                    equipado: true, 
+                    icono: '⚔️',
+                    precio: 1100,
+                    stats: { fuerza: 0, magia: 0, esencia: 30, vida: -20 }
+                },
+                { 
+                    id: 3,
+                    nombre: 'Poción de Vida', 
+                    tipo: 'Consumible',
+                    cantidad: 5, 
+                    equipado: false, 
+                    icono: '🧴',
+                    precio: 200,
+                    stats: { fuerza: 0, magia: 0, esencia: 0, vida: 100 }
+                },
+                { 
+                    id: 4,
+                    nombre: 'Daga de Basilisco', 
+                    tipo: 'Equipo',
+                    cantidad: 1, 
+                    equipado: false, 
+                    icono: '🗡️',
+                    precio: 1500,
+                    stats: { fuerza: -20, magia: 25, esencia: -5, vida: 0 }
+                },
+                { 
+                    id: 5,
+                    nombre: 'Mapa del Reino', 
+                    tipo: 'Sagrado',
+                    cantidad: 1, 
+                    equipado: false, 
+                    icono: '🗺️',
+                    precio: 150000,
+                    stats: { fuerza: 0, magia: 1000, esencia: 200, vida: 0 }
+                },
+                { 
+                    id: 6,
+                    nombre: 'Miel de Hada', 
+                    tipo: 'Consumible',
+                    cantidad: 2, 
+                    equipado: false, 
+                    icono: '🍯',
+                    precio: 400,
+                    stats: { fuerza: 60, magia: 50, esencia: 2, vida: 15 }
+                }
+            ],
+            historial: [
+                { nombre: 'Poción de Vida', fecha: '2026-02-18' },
+                { nombre: 'Néctar de Yggdrasil', fecha: '2026-02-17' },
+                { nombre: 'Carne de Quimera', fecha: '2026-02-16' }
+            ]
+        };
+
+        let objetoSeleccionado = null;
+
+        // Actualizar stats
+        document.getElementById('cristales').textContent = inventarioData.cristales.toLocaleString() + ' 💎';
+        document.getElementById('stat-fuerza').textContent = inventarioData.stats.fuerza;
+        document.getElementById('stat-magia').textContent = inventarioData.stats.magia;
+        document.getElementById('stat-esencia').textContent = inventarioData.stats.esencia;
+        document.getElementById('stat-vida').textContent = inventarioData.stats.vida;
+
+        function cambiarTab(tab) {
+            // Actualizar pestañas
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('activo'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('activo'));
+            
+            event.target.classList.add('activo');
+            document.getElementById(`tab-${tab}`).classList.add('activo');
+
+            // Cargar contenido según la pestaña
+            if (tab === 'disponibles') cargarDisponibles();
+            if (tab === 'equipados') cargarEquipados();
+            if (tab === 'historial') cargarHistorial();
+        }
+
+        function cargarDisponibles() {
+            const grid = document.getElementById('grid-disponibles');
+            grid.innerHTML = '';
+
+            inventarioData.objetos.filter(obj => !obj.equipado).forEach(obj => {
+                const card = crearObjetoCard(obj);
+                grid.appendChild(card);
+            });
+        }
+
+        function cargarEquipados() {
+            const grid = document.getElementById('grid-equipados');
+            grid.innerHTML = '';
+
+            const equipados = inventarioData.objetos.filter(obj => obj.equipado);
+            document.querySelector('.tab:nth-child(2)').textContent = `EQUIPADOS (${equipados.length})`;
+
+            equipados.forEach(obj => {
+                const card = crearObjetoCard(obj, true);
+                grid.appendChild(card);
+            });
+        }
+
+        function cargarHistorial() {
+            const grid = document.getElementById('grid-historial');
+            grid.innerHTML = '';
+
+            inventarioData.historial.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'historial-item';
+                div.innerHTML = `
+                    <span class="historial-nombre">${item.nombre}</span>
+                    <span class="historial-fecha">${item.fecha}</span>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function crearObjetoCard(obj, equipado = false) {
+            const card = document.createElement('div');
+            card.className = `objeto-card ${obj.equipado ? 'equipado' : ''}`;
+
+            card.innerHTML = `
+                <div class="objeto-icono">${obj.icono}</div>
+                <div class="objeto-nombre">${obj.nombre}</div>
+                <div class="objeto-info">
+                    <span>${obj.tipo}</span>
+                    <span>x${obj.cantidad}</span>
+                </div>
+                <div class="objeto-stats">
+                    ${obj.stats.fuerza !== 0 ? `<span class="stat-mod">F:${obj.stats.fuerza > 0 ? '+' : ''}${obj.stats.fuerza}</span>` : ''}
+                    ${obj.stats.magia !== 0 ? `<span class="stat-mod">M:${obj.stats.magia > 0 ? '+' : ''}${obj.stats.magia}</span>` : ''}
+                </div>
+                <div class="objeto-botones">
+                    <button class="btn-objeto ${obj.tipo === 'Consumible' ? 'usar' : 'equipar'}" onclick="event.stopPropagation(); ${obj.tipo === 'Consumible' ? 'usarObjeto' : 'equiparObjeto'}(${obj.id})">
+                        ${obj.tipo === 'Consumible' ? 'USAR' : (obj.equipado ? 'DESEQUIPAR' : 'EQUIPAR')}
+                    </button>
+                </div>
+            `;
+
+            card.onclick = () => mostrarDetalle(obj);
+            return card;
+        }
+
+        function mostrarDetalle(obj) {
+            objetoSeleccionado = obj;
+            document.getElementById('modal-titulo').textContent = obj.nombre;
+            document.getElementById('modal-fuerza').textContent = (obj.stats.fuerza > 0 ? '+' : '') + obj.stats.fuerza;
+            document.getElementById('modal-magia').textContent = (obj.stats.magia > 0 ? '+' : '') + obj.stats.magia;
+            document.getElementById('modal-esencia').textContent = (obj.stats.esencia > 0 ? '+' : '') + obj.stats.esencia;
+            document.getElementById('modal-vida').textContent = (obj.stats.vida > 0 ? '+' : '') + obj.stats.vida;
+            document.getElementById('modal-precio').textContent = `Comprado en: ${obj.precio} 💎`;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function equiparObjeto(id) {
+            const obj = inventarioData.objetos.find(o => o.id === id);
+            if (!obj) return;
+
+            if (obj.equipado) {
+                obj.equipado = false;
+                // Quitar stats
+                inventarioData.stats.fuerza -= obj.stats.fuerza;
+                inventarioData.stats.magia -= obj.stats.magia;
+                inventarioData.stats.esencia -= obj.stats.esencia;
+                inventarioData.stats.vida -= obj.stats.vida;
+            } else {
+                // Verificar límite de 3 equipados
+                const equipados = inventarioData.objetos.filter(o => o.equipado).length;
+                if (equipados >= 3) {
+                    alert('SOLO PUEDES EQUIPAR 3 OBJETOS');
+                    return;
+                }
+                obj.equipado = true;
+                // Añadir stats
+                inventarioData.stats.fuerza += obj.stats.fuerza;
+                inventarioData.stats.magia += obj.stats.magia;
+                inventarioData.stats.esencia += obj.stats.esencia;
+                inventarioData.stats.vida += obj.stats.vida;
+            }
+
+            // Actualizar interfaz
+            actualizarStats();
+            cargarDisponibles();
+            cargarEquipados();
+            cerrarModal();
+        }
+
+        function usarObjeto(id) {
+            const obj = inventarioData.objetos.find(o => o.id === id);
+            if (!obj) return;
+
+            obj.cantidad--;
+            
+            // Añadir al historial
+            inventarioData.historial.unshift({
+                nombre: obj.nombre,
+                fecha: new Date().toISOString().split('T')[0]
+            });
+
+            if (obj.cantidad <= 0) {
+                inventarioData.objetos = inventarioData.objetos.filter(o => o.id !== id);
+            }
+
+            // Aplicar efectos temporales (simulado)
+            alert(`✨ HAS USADO ${obj.nombre} ✨\n\nEFECTOS APLICADOS POR 1 HORA`);
+
+            actualizarStats();
+            cargarDisponibles();
+            cargarEquipados();
+            cargarHistorial();
+            cerrarModal();
+        }
+
+        function actualizarStats() {
+            document.getElementById('stat-fuerza').textContent = inventarioData.stats.fuerza;
+            document.getElementById('stat-magia').textContent = inventarioData.stats.magia;
+            document.getElementById('stat-esencia').textContent = inventarioData.stats.esencia;
+            document.getElementById('stat-vida').textContent = inventarioData.stats.vida;
+        }
+
+        // Cargar objetos disponibles al inicio
+        cargarDisponibles();
+        cargarEquipados();
+        cargarHistorial();
+    </script>
+</body>
+</html>

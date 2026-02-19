@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÍGNEO - TIENDA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        @font-face {
+            font-family: 'Determination';
+            src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Press Start 2P', monospace;
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .fondo-estrellas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            z-index: 0;
+        }
+
+        .estrella {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            animation: parpadear 2s infinite alternate;
+        }
+
+        @keyframes parpadear {
+            from { opacity: 0.2; }
+            to { opacity: 1; }
+        }
+
+        .particula-color {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: flotarColor 8s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes flotarColor {
+            0% { transform: translateY(0) translateX(0); opacity: 0.8; }
+            100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
+        }
+
+        .contenedor {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #000000;
+            border: 6px solid #ffffff;
+            box-shadow: 0 0 0 6px #000000, 0 0 0 12px #7f7f7f;
+            padding: 30px;
+            animation: aparecer 0.5s steps(10) forwards;
+        }
+
+        @keyframes aparecer {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffff00;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 0 #ff0000;
+        }
+
+        .linea {
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ffffff, #ffff00, #ffffff, transparent);
+            margin: 20px 0;
+            animation: moverLinea 3s infinite;
+        }
+
+        @keyframes moverLinea {
+            0% { background-position: -200px; }
+            100% { background-position: 200px; }
+        }
+
+        /* Info superior: tienda actual y saldo */
+        .info-superior {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .tienda-info h2 {
+            color: #ffff00;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .tienda-info .tipo {
+            color: #7f7f7f;
+            font-size: 0.7rem;
+        }
+
+        .saldo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .saldo .etiqueta {
+            color: #ffff00;
+            font-size: 0.8rem;
+        }
+
+        .saldo .valor {
+            color: #00ff00;
+            font-size: 1.2rem;
+        }
+
+        /* Layout principal: lista de objetos + detalle */
+        .layout-tienda {
+            display: flex;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        /* Lista de objetos (izquierda) */
+        .lista-objetos {
+            flex: 1;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .objeto-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 3px solid #7f7f7f;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.05s step-end;
+            background: #0a0a1a;
+        }
+
+        .objeto-item:hover {
+            border-color: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #2a2a3a;
+        }
+
+        .objeto-item.seleccionado {
+            border-color: #ffff00;
+            background: #2a2a3a;
+        }
+
+        .objeto-icono {
+            font-size: 2rem;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .objeto-info {
+            flex: 1;
+        }
+
+        .objeto-nombre {
+            color: #00ff00;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .objeto-tipo {
+            color: #7f7f7f;
+            font-size: 0.6rem;
+            margin-bottom: 5px;
+        }
+
+        .objeto-stats {
+            display: flex;
+            gap: 10px;
+            font-size: 0.6rem;
+        }
+
+        .stat-mod {
+            color: #ffff00;
+        }
+
+        /* Panel de detalle (derecha) */
+        .panel-detalle {
+            width: 350px;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 20px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .detalle-icono {
+            font-size: 4rem;
+            text-align: center;
+            margin: 20px 0;
+            animation: flotarIcono 2s infinite alternate;
+        }
+
+        @keyframes flotarIcono {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        .detalle-nombre {
+            color: #ffff00;
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #7f7f7f;
+            padding-bottom: 10px;
+        }
+
+        .detalle-stats {
+            background: #0a0a1a;
+            border: 3px solid #7f7f7f;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-linea {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.7rem;
+        }
+
+        .stat-label {
+            color: #7f7f7f;
+        }
+
+        .stat-valor {
+            color: #00ff00;
+        }
+
+        .stat-valor.negativo {
+            color: #ff4444;
+        }
+
+        .detalle-precio {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #ffff00;
+            margin-bottom: 20px;
+        }
+
+        .selector-cantidad {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .selector-cantidad button {
+            width: 40px;
+            height: 40px;
+            background: #0a0a1a;
+            border: 3px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .selector-cantidad button:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        .selector-cantidad span {
+            font-size: 1.2rem;
+            min-width: 50px;
+            text-align: center;
+            color: #00ff00;
+        }
+
+        .btn-comprar {
+            width: 100%;
+            padding: 20px;
+            background: #003300;
+            border: 4px solid #00ff00;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.05s step-end;
+            margin-bottom: 10px;
+        }
+
+        .btn-comprar:hover {
+            background: #004400;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #00ff00;
+        }
+
+        .btn-comprar:active {
+            transform: translate(4px, 4px);
+            box-shadow: none;
+        }
+
+        .btn-volver-lista {
+            width: 100%;
+            padding: 15px;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .btn-volver-lista:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        /* Mensaje de error/éxito */
+        .mensaje {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px;
+            background: #000000;
+            border-width: 6px;
+            border-style: solid;
+            z-index: 1000;
+            text-align: center;
+            line-height: 2;
+            animation: aparecerMensaje 0.2s steps(5);
+        }
+
+        .mensaje.error {
+            border-color: #ff0000;
+            background: #330000;
+            color: white;
+        }
+
+        .mensaje.exito {
+            border-color: #00ff00;
+            background: #003300;
+            color: white;
+        }
+
+        @keyframes aparecerMensaje {
+            from { transform: translate(-50%, -50%) scale(0); }
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Botón volver */
+        .btn-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto 10px;
+            padding: 15px;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 8px 8px 0 #0a0a1a;
+            transition: all 0.05s step-end;
+        }
+
+        .btn-volver:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0 #0a0a1a;
+        }
+
+        .btn-volver:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 #0a0a1a;
+        }
+
+        @media (max-width: 900px) {
+            .layout-tienda { flex-direction: column; }
+            .panel-detalle { width: 100%; position: static; }
+        }
+    </style>
+</head>
+<body>
+    <div class="fondo-estrellas" id="fondo"></div>
+    <div id="particulas"></div>
+
+    <div class="contenedor">
+        <h1>TIENDA</h1>
+        <div class="linea"></div>
+
+        <!-- Info superior -->
+        <div class="info-superior" id="info-superior">
+            <div class="tienda-info">
+                <h2 id="tienda-nombre">El Cáliz Eterno</h2>
+                <div class="tipo" id="tienda-tipo">Consumibles</div>
+            </div>
+            <div class="saldo">
+                <span class="etiqueta">TUS CRISTALES:</span>
+                <span class="valor" id="cristales">2,450 💎</span>
+            </div>
+        </div>
+
+        <!-- Layout principal -->
+        <div class="layout-tienda">
+            <!-- Lista de objetos -->
+            <div class="lista-objetos" id="lista-objetos">
+                <!-- Los objetos se cargarán aquí con JavaScript -->
+            </div>
+
+            <!-- Panel de detalle -->
+            <div class="panel-detalle" id="panel-detalle">
+                <div class="detalle-icono" id="detalle-icono">🧪</div>
+                <div class="detalle-nombre" id="detalle-nombre">Néctar de Yggdrasil</div>
+                
+                <div class="detalle-stats" id="detalle-stats">
+                    <div class="stat-linea">
+                        <span class="stat-label">FUERZA</span>
+                        <span class="stat-valor" id="detalle-fuerza">+150</span>
+                    </div>
+                    <div class="stat-linea">
+                        <span class="stat-label">MAGIA</span>
+                        <span class="stat-valor" id="detalle-magia">+100</span>
+                    </div>
+                    <div class="stat-linea">
+                        <span class="stat-label">ESENCIA</span>
+                        <span class="stat-valor negativo" id="detalle-esencia">-30</span>
+                    </div>
+                    <div class="stat-linea">
+                        <span class="stat-label">VIDA</span>
+                        <span class="stat-valor" id="detalle-vida">0</span>
+                    </div>
+                </div>
+
+                <div class="detalle-precio" id="detalle-precio">150 💎</div>
+
+                <div class="selector-cantidad">
+                    <button onclick="cambiarCantidad(-1)">-</button>
+                    <span id="cantidad">1</span>
+                    <button onclick="cambiarCantidad(1)">+</button>
+                </div>
+
+                <button class="btn-comprar" onclick="comprarObjeto()">COMPRAR</button>
+                <button class="btn-volver-lista" onclick="limpiarSeleccion()">VER TODOS</button>
+            </div>
+        </div>
+
+        <!-- Botón volver a tiendas -->
+        <button class="btn-volver" onclick="window.location.href='tiendas.html'">
+            VOLVER A TIENDAS
+        </button>
+    </div>
+
+    <script>
+        // Generar estrellas
+        const fondo = document.getElementById('fondo');
+        for (let i = 0; i < 150; i++) {
+            const estrella = document.createElement('div');
+            estrella.className = 'estrella';
+            estrella.style.left = Math.random() * 100 + '%';
+            estrella.style.top = Math.random() * 100 + '%';
+            estrella.style.animationDelay = Math.random() * 3 + 's';
+            fondo.appendChild(estrella);
+        }
+
+        // Generar partículas arcoíris
+        const particulas = document.getElementById('particulas');
+        const colores = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff', '#ff00ff'];
+        
+        for (let i = 0; i < 50; i++) {
+            const p = document.createElement('div');
+            p.className = 'particula-color';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.background = colores[Math.floor(Math.random() * colores.length)];
+            p.style.animationDelay = Math.random() * 5 + 's';
+            p.style.animationDuration = (5 + Math.random() * 10) + 's';
+            particulas.appendChild(p);
+        }
+
+        // Obtener ID de la tienda de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tiendaId = parseInt(urlParams.get('id')) || 1;
+
+        // Datos del personaje (simulados)
+        const personajeData = {
+            cristales: 2450
+        };
+
+        // Datos de las tiendas
+        const tiendasData = {
+            1: {
+                nombre: 'El Cáliz Eterno',
+                tipo: 'Consumibles',
+                objetos: [
+                    { id: 1, nombre: 'Néctar de Yggdrasil', icono: '🧪', precio: 150, stats: { fuerza: 150, magia: 100, esencia: -30, vida: 0 } },
+                    { id: 2, nombre: 'Carne de Quimera', icono: '🍖', precio: 300, stats: { fuerza: 80, magia: -10, esencia: 15, vida: 0 } },
+                    { id: 3, nombre: 'Raíz de Mandrágora', icono: '🌿', precio: 120, stats: { fuerza: 40, magia: -20, esencia: -5, vida: 0 } },
+                    { id: 4, nombre: 'Miel de Hada', icono: '🍯', precio: 400, stats: { fuerza: 60, magia: 50, esencia: 2, vida: 15 } },
+                    { id: 5, nombre: 'Hongo Alucinógeno', icono: '🍄', precio: 250, stats: { fuerza: -15, magia: 100, esencia: 20, vida: -10 } },
+                    { id: 6, nombre: 'Fruta del Nemeton', icono: '🍎', precio: 400, stats: { fuerza: 40, magia: 40, esencia: 10, vida: 30 } },
+                    { id: 7, nombre: 'Frasco de Niebla', icono: '🧪', precio: 850, stats: { fuerza: 0, magia: -30, esencia: 0, vida: 0 } },
+                    { id: 8, nombre: 'Lágrima de Integra', icono: '💧', precio: 15000, stats: { fuerza: 1000, magia: 80, esencia: 50, vida: 30 } },
+                    { id: 9, nombre: 'Vial de Sangre', icono: '🧪', precio: 500, stats: { fuerza: 100, magia: 15, esencia: 5, vida: 10 } },
+                    { id: 10, nombre: 'Poción de Vida', icono: '🧴', precio: 200, stats: { fuerza: 0, magia: 0, esencia: 0, vida: 100 } }
+                ]
+            },
+            2: {
+                nombre: 'Reliquias del Alba',
+                tipo: 'Sagrados',
+                objetos: [
+                    { id: 11, nombre: 'Mapa del Reino', icono: '🗺️', precio: 150000, stats: { fuerza: 0, magia: 1000, esencia: 200, vida: 0 } },
+                    { id: 12, nombre: 'Cáliz de Sangre', icono: '🏆', precio: 1000, stats: { fuerza: 100, magia: 100, esencia: 100, vida: 10 } },
+                    { id: 13, nombre: 'Reloj de Arena', icono: '⏳', precio: 60000, stats: { fuerza: -50, magia: 300, esencia: 0, vida: 80 } },
+                    { id: 14, nombre: 'Huevo de Fénix', icono: '🥚', precio: 80, stats: { fuerza: 1000, magia: 150, esencia: 20, vida: 100 } },
+                    { id: 15, nombre: 'Ojo de la Verdad', icono: '👁️', precio: 35000, stats: { fuerza: -60, magia: 400, esencia: 0, vida: 90 } },
+                    { id: 16, nombre: 'Contrato de Alma', icono: '📜', precio: 0, stats: { fuerza: 666, magia: 666, esencia: 150, vida: -200 } },
+                    { id: 17, nombre: 'Corona de Espinas', icono: '👑', precio: 20000, stats: { fuerza: -10, magia: 70, esencia: 30, vida: 120 } },
+                    { id: 18, nombre: 'Grimorio de Stolas', icono: '📖', precio: 25000, stats: { fuerza: -70, magia: 500, esencia: 40, vida: -60 } },
+                    { id: 19, nombre: 'Anillo del Rey', icono: '💍', precio: 50000, stats: { fuerza: 30, magia: 60, esencia: 10, vida: 40 } }
+                ]
+            },
+            3: {
+                nombre: 'El Yunque Cenizo',
+                tipo: 'Equipo',
+                objetos: [
+                    { id: 20, nombre: 'Daga de Basilisco', icono: '🗡️', precio: 1500, stats: { fuerza: -20, magia: 25, esencia: -5, vida: 0 } },
+                    { id: 21, nombre: 'Lanza de Sombras', icono: '🔱', precio: 4000, stats: { fuerza: -10, magia: -40, esencia: 60, vida: -15 } },
+                    { id: 22, nombre: 'Tridente de Coral', icono: '🔱', precio: 3200, stats: { fuerza: 0, magia: 30, esencia: 45, vida: 15 } },
+                    { id: 23, nombre: 'Guanteletes de Zero', icono: '👊', precio: 4500, stats: { fuerza: 0, magia: -60, esencia: 55, vida: 0 } },
+                    { id: 24, nombre: 'Espada de Hierro', icono: '⚔️', precio: 1100, stats: { fuerza: 0, magia: 0, esencia: 30, vida: -20 } },
+                    { id: 25, nombre: 'Hacha de Batalla', icono: '🪓', precio: 1300, stats: { fuerza: 0, magia: 0, esencia: 40, vida: 0 } },
+                    { id: 26, nombre: 'Látigo de Fuego', icono: '🔗', precio: 2700, stats: { fuerza: -5, magia: 20, esencia: 35, vida: -10 } },
+                    { id: 27, nombre: 'Capa de Cuervo', icono: '🧥', precio: 2800, stats: { fuerza: 15, magia: 20, esencia: 5, vida: -10 } },
+                    { id: 28, nombre: 'Túnica de Araña', icono: '👘', precio: 3800, stats: { fuerza: 10, magia: 200, esencia: 0, vida: 50 } },
+                    { id: 29, nombre: 'Botas Aladas', icono: '👢', precio: 5000, stats: { fuerza: 5, magia: 40, esencia: 10, vida: 20 } },
+                    { id: 30, nombre: 'Manto de Luma', icono: '🧥', precio: 6200, stats: { fuerza: 60, magia: 60, esencia: 15, vida: 30 } },
+                    { id: 31, nombre: 'Casco de Zero', icono: '⛑️', precio: 2000, stats: { fuerza: 10, magia: 0, esencia: 5, vida: 0 } }
+                ]
+            },
+            4: {
+                nombre: 'Esencia Pura',
+                tipo: 'Materiales',
+                objetos: [
+                    { id: 32, nombre: 'Lingote de Hierro', icono: '⛓️', precio: 500, stats: { fuerza: 0, magia: 0, esencia: 10, vida: -5 } },
+                    { id: 33, nombre: 'Polvo de Diamante', icono: '✨', precio: 1500, stats: { fuerza: 0, magia: 20, esencia: 5, vida: 25 } },
+                    { id: 34, nombre: 'Aceite de Telquines', icono: '🫗', precio: 400, stats: { fuerza: 0, magia: 0, esencia: 2, vida: 5 } }
+                ]
+            },
+            5: {
+                nombre: 'El Bazar Umbrío',
+                tipo: 'Misceláneos',
+                objetos: [
+                    { id: 35, nombre: 'Brújula de Cassius', icono: '🧭', precio: 9000, stats: { fuerza: 0, magia: 80, esencia: 0, vida: 60 } },
+                    { id: 36, nombre: 'Llave de Cristal', icono: '🔑', precio: 12000, stats: { fuerza: -50, magia: 0, esencia: 0, vida: 0 } },
+                    { id: 37, nombre: 'Piedra del Hogar', icono: '🪨', precio: 6000, stats: { fuerza: 0, magia: -150, esencia: 0, vida: 10 } },
+                    { id: 38, nombre: 'Diente de Megalodón', icono: '🦷', precio: 22000, stats: { fuerza: 0, magia: 0, esencia: 110, vida: 20 } }
+                ]
+            }
+        };
+
+        // Obtener tienda actual
+        const tiendaActual = tiendasData[tiendaId] || tiendasData[1];
+        let objetosTienda = tiendaActual.objetos || [];
+        let objetoSeleccionado = objetosTienda[0] || null;
+        let cantidad = 1;
+
+        // Actualizar información de la tienda
+        document.getElementById('tienda-nombre').textContent = tiendaActual.nombre;
+        document.getElementById('tienda-tipo').textContent = tiendaActual.tipo;
+        document.getElementById('cristales').textContent = personajeData.cristales.toLocaleString() + ' 💎';
+
+        // Cargar lista de objetos
+        function cargarListaObjetos() {
+            const lista = document.getElementById('lista-objetos');
+            lista.innerHTML = '';
+
+            objetosTienda.forEach(obj => {
+                const item = document.createElement('div');
+                item.className = `objeto-item ${objetoSeleccionado && objetoSeleccionado.id === obj.id ? 'seleccionado' : ''}`;
+                
+                // Crear resumen de stats
+                const statsText = [];
+                if (obj.stats.fuerza !== 0) statsText.push(`F:${obj.stats.fuerza > 0 ? '+' : ''}${obj.stats.fuerza}`);
+                if (obj.stats.magia !== 0) statsText.push(`M:${obj.stats.magia > 0 ? '+' : ''}${obj.stats.magia}`);
+                if (obj.stats.esencia !== 0) statsText.push(`E:${obj.stats.esencia > 0 ? '+' : ''}${obj.stats.esencia}`);
+                if (obj.stats.vida !== 0) statsText.push(`V:${obj.stats.vida > 0 ? '+' : ''}${obj.stats.vida}`);
+
+                item.innerHTML = `
+                    <div class="objeto-icono">${obj.icono}</div>
+                    <div class="objeto-info">
+                        <div class="objeto-nombre">${obj.nombre}</div>
+                        <div class="objeto-tipo">${tiendaActual.tipo}</div>
+                        <div class="objeto-stats">
+                            ${statsText.map(s => `<span class="stat-mod">${s}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+
+                item.onclick = () => seleccionarObjeto(obj);
+                lista.appendChild(item);
+            });
+        }
+
+        // Seleccionar objeto
+        function seleccionarObjeto(obj) {
+            objetoSeleccionado = obj;
+            cantidad = 1;
+            document.getElementById('cantidad').textContent = cantidad;
+            
+            // Actualizar panel de detalle
+            document.getElementById('detalle-icono').textContent = obj.icono;
+            document.getElementById('detalle-nombre').textContent = obj.nombre;
+            document.getElementById('detalle-fuerza').textContent = (obj.stats.fuerza > 0 ? '+' : '') + obj.stats.fuerza;
+            document.getElementById('detalle-fuerza').className = obj.stats.fuerza < 0 ? 'stat-valor negativo' : 'stat-valor';
+            document.getElementById('detalle-magia').textContent = (obj.stats.magia > 0 ? '+' : '') + obj.stats.magia;
+            document.getElementById('detalle-magia').className = obj.stats.magia < 0 ? 'stat-valor negativo' : 'stat-valor';
+            document.getElementById('detalle-esencia').textContent = (obj.stats.esencia > 0 ? '+' : '') + obj.stats.esencia;
+            document.getElementById('detalle-esencia').className = obj.stats.esencia < 0 ? 'stat-valor negativo' : 'stat-valor';
+            document.getElementById('detalle-vida').textContent = (obj.stats.vida > 0 ? '+' : '') + obj.stats.vida;
+            document.getElementById('detalle-vida').className = obj.stats.vida < 0 ? 'stat-valor negativo' : 'stat-valor';
+            document.getElementById('detalle-precio').textContent = obj.precio + ' 💎';
+
+            // Actualizar lista (para marcar el seleccionado)
+            cargarListaObjetos();
+        }
+
+        // Cambiar cantidad
+        function cambiarCantidad(delta) {
+            if (!objetoSeleccionado) return;
+            cantidad = Math.max(1, Math.min(20, cantidad + delta));
+            document.getElementById('cantidad').textContent = cantidad;
+        }
+
+        // Comprar objeto
+        function comprarObjeto() {
+            if (!objetoSeleccionado) {
+                mostrarMensaje('SELECCIONA UN OBJETO PRIMERO', 'error');
+                return;
+            }
+
+            const precioTotal = objetoSeleccionado.precio * cantidad;
+
+            if (personajeData.cristales < precioTotal) {
+                mostrarMensaje('NO TIENES SUFICIENTES CRISTALES', 'error');
+                return;
+            }
+
+            personajeData.cristales -= precioTotal;
+            document.getElementById('cristales').textContent = personajeData.cristales.toLocaleString() + ' 💎';
+
+            mostrarMensaje(`✓ COMPRA EXITOSA ✓\n${cantidad} x ${objetoSeleccionado.nombre}`, 'exito');
+            
+            // Aquí se guardaría en Supabase el inventario
+        }
+
+        // Limpiar selección
+        function limpiarSeleccion() {
+            objetoSeleccionado = objetosTienda[0] || null;
+            if (objetoSeleccionado) {
+                seleccionarObjeto(objetoSeleccionado);
+            }
+        }
+
+        // Mostrar mensaje
+        function mostrarMensaje(texto, tipo) {
+            const mensaje = document.createElement('div');
+            mensaje.className = 'mensaje ' + tipo;
+            mensaje.textContent = texto;
+            document.body.appendChild(mensaje);
+            setTimeout(() => mensaje.remove(), 3000);
+        }
+
+        // Inicializar
+        cargarListaObjetos();
+        if (objetosTienda.length > 0) {
+            seleccionarObjeto(objetosTienda[0]);
+        }
+
+        // Hacer funciones globales
+        window.cambiarCantidad = cambiarCantidad;
+        window.comprarObjeto = comprarObjeto;
+        window.limpiarSeleccion = limpiarSeleccion;
+    </script>
+</body>
+</html>

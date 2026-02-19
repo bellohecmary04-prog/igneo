@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÍGNEO - SALA DEL CONSEJO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        @font-face {
+            font-family: 'Determination';
+            src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Press Start 2P', monospace;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fondo-estrellas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            z-index: 0;
+        }
+
+        .estrella {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            animation: parpadear 2s infinite alternate;
+        }
+
+        @keyframes parpadear {
+            from { opacity: 0.2; }
+            to { opacity: 1; }
+        }
+
+        .particula-color {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: flotarColor 8s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes flotarColor {
+            0% { transform: translateY(0) translateX(0); opacity: 0.8; }
+            100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
+        }
+
+        .contenedor {
+            position: relative;
+            z-index: 10;
+            max-width: 900px;
+            width: 100%;
+            background: #000000;
+            border: 6px solid #ffffff;
+            box-shadow: 0 0 0 6px #000000, 0 0 0 12px #7f7f7f;
+            padding: 40px 30px;
+            animation: aparecer 0.5s steps(10) forwards;
+        }
+
+        @keyframes aparecer {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffff00;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 0 #ff0000;
+            letter-spacing: 4px;
+        }
+
+        .linea {
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ffffff, #ffff00, #ffffff, transparent);
+            margin: 20px 0;
+            animation: moverLinea 3s infinite;
+        }
+
+        @keyframes moverLinea {
+            0% { background-position: -200px; }
+            100% { background-position: 200px; }
+        }
+
+        .bienvenida {
+            text-align: center;
+            color: #00ff00;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 3px solid #00ff00;
+            animation: parpadearBienvenida 1.5s infinite alternate;
+        }
+
+        @keyframes parpadearBienvenida {
+            from { opacity: 0.7; box-shadow: 0 0 5px #00ff00; }
+            to { opacity: 1; box-shadow: 0 0 20px #00ff00; }
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .opcion {
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #ffffff;
+            transition: all 0.05s step-end;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 8px 8px 0 #2a2a3a;
+        }
+
+        .opcion::before {
+            content: "▶";
+            position: absolute;
+            left: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffff00;
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: all 0.1s step-end;
+        }
+
+        .opcion:hover::before {
+            opacity: 1;
+            left: -20px;
+        }
+
+        .opcion:hover {
+            border-color: #ffff00;
+            background: #2a2a3a;
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0 #2a2a3a;
+        }
+
+        .opcion:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 #2a2a3a;
+        }
+
+        .opcion.seleccionada {
+            border-color: #ffff00;
+            background: #2a2a3a;
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0 #2a2a3a;
+        }
+
+        .opcion.seleccionada::before {
+            opacity: 1;
+            left: -20px;
+        }
+
+        .info-personaje {
+            margin-top: 30px;
+            padding: 20px;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+        }
+
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #ffff00;
+            font-size: 0.8rem;
+        }
+
+        .stats-rapidas {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: #0a0a1a;
+            border: 3px solid #7f7f7f;
+        }
+
+        .stat-label {
+            color: #7f7f7f;
+            font-size: 0.6rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-valor {
+            color: #00ff00;
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            text-align: center;
+            color: #7f7f7f;
+            font-size: 0.7rem;
+            margin-top: 30px;
+            border-top: 2px solid #7f7f7f;
+            padding-top: 20px;
+        }
+
+        .boton-cerrar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #1a1a2a;
+            border: 3px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.6rem;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .boton-cerrar:hover {
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+
+        @media (max-width: 600px) {
+            .menu-grid { grid-template-columns: 1fr; }
+            .stats-rapidas { grid-template-columns: 1fr; }
+            h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="fondo-estrellas" id="fondo"></div>
+    <div id="particulas"></div>
+
+    <div class="contenedor" id="contenedor">
+        <button class="boton-cerrar" onclick="window.location.href='index.html'">CERRAR SESIÓN</button>
+
+        <h1>Í G N E O</h1>
+        <div class="linea"></div>
+
+        <div class="bienvenida" id="bienvenida">
+            EL CONSEJO TE RECIBE, GUERRERO
+        </div>
+
+        <!-- Grid de 5 opciones (2 columnas, la última ocupa 2) -->
+        <div class="menu-grid" id="menu-grid">
+            <div class="opcion" data-opcion="personaje" id="opcion-personaje">
+                PERSONAJE
+            </div>
+            <div class="opcion" data-opcion="inventario" id="opcion-inventario">
+                INVENTARIO
+            </div>
+            <div class="opcion" data-opcion="tienda" id="opcion-tienda">
+                TIENDA
+            </div>
+            <div class="opcion" data-opcion="mundo" id="opcion-mundo">
+                MUNDO
+            </div>
+            <div class="opcion" data-opcion="trabajo" id="opcion-trabajo" style="grid-column: span 2;">
+                TRABAJO / LOGROS
+            </div>
+        </div>
+
+        <!-- Info rápida del personaje -->
+        <div class="info-personaje">
+            <div class="info-header">
+                <span>INFORMACIÓN RÁPIDA</span>
+                <span id="nombre-personaje">KAELEN FENRIR</span>
+            </div>
+            <div class="stats-rapidas">
+                <div class="stat-item">
+                    <div class="stat-label">CRISTALES</div>
+                    <div class="stat-valor" id="cristales">💎 2,450</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">RAZA</div>
+                    <div class="stat-valor" id="raza-personaje">EL FÉNIX</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">RANGO</div>
+                    <div class="stat-valor" id="rango-personaje">RANGO IV</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            * SOLO LOS DIGNOS TRASPASAN ESTE UMBRAL *
+        </div>
+    </div>
+
+    <script>
+        // Generar estrellas
+        const fondo = document.getElementById('fondo');
+        for (let i = 0; i < 200; i++) {
+            const estrella = document.createElement('div');
+            estrella.className = 'estrella';
+            estrella.style.left = Math.random() * 100 + '%';
+            estrella.style.top = Math.random() * 100 + '%';
+            estrella.style.animationDelay = Math.random() * 3 + 's';
+            fondo.appendChild(estrella);
+        }
+
+        // Generar partículas arcoíris
+        const particulas = document.getElementById('particulas');
+        const colores = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff', '#ff00ff'];
+        
+        for (let i = 0; i < 50; i++) {
+            const p = document.createElement('div');
+            p.className = 'particula-color';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.background = colores[Math.floor(Math.random() * colores.length)];
+            p.style.animationDelay = Math.random() * 5 + 's';
+            p.style.animationDuration = (5 + Math.random() * 10) + 's';
+            particulas.appendChild(p);
+        }
+
+        const opciones = document.querySelectorAll('.opcion');
+        const bienvenida = document.getElementById('bienvenida');
+        let indiceSeleccionado = 0;
+
+        // Datos del personaje (simulados)
+        const datosPersonaje = {
+            nombre: 'KAELEN FENRIR',
+            raza: 'EL FÉNIX',
+            rango: 'RANGO IV',
+            cristales: 2450
+        };
+
+        document.getElementById('nombre-personaje').textContent = datosPersonaje.nombre;
+        document.getElementById('raza-personaje').textContent = datosPersonaje.raza;
+        document.getElementById('rango-personaje').textContent = datosPersonaje.rango;
+        document.getElementById('cristales').textContent = '💎 ' + datosPersonaje.cristales.toLocaleString();
+
+        function actualizarSeleccion() {
+            opciones.forEach(op => op.classList.remove('seleccionada'));
+            opciones[indiceSeleccionado].classList.add('seleccionada');
+        }
+
+        // Sistema de selección con teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.key.startsWith('Arrow')) {
+                e.preventDefault();
+            }
+
+            const totalOpciones = opciones.length;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                    if (indiceSeleccionado - 2 >= 0) indiceSeleccionado -= 2;
+                    break;
+                case 'ArrowDown':
+                    if (indiceSeleccionado + 2 < totalOpciones) indiceSeleccionado += 2;
+                    break;
+                case 'ArrowLeft':
+                    if (indiceSeleccionado > 0) indiceSeleccionado--;
+                    break;
+                case 'ArrowRight':
+                    if (indiceSeleccionado < totalOpciones - 1) indiceSeleccionado++;
+                    break;
+                case 'Enter':
+                    const destino = opciones[indiceSeleccionado].dataset.opcion;
+                    window.location.href = destino + '.html';
+                    break;
+            }
+            
+            actualizarSeleccion();
+        });
+
+        // Click con mouse
+        opciones.forEach((opcion, index) => {
+            opcion.addEventListener('click', function() {
+                const destino = this.dataset.opcion;
+                window.location.href = destino + '.html';
+            });
+
+            opcion.addEventListener('mouseenter', function() {
+                indiceSeleccionado = index;
+                actualizarSeleccion();
+            });
+        });
+
+        // Mensajes de bienvenida cambiantes
+        const mensajes = [
+            "EL CONSEJO TE RECIBE, GUERRERO",
+            "TU DESTINO TE ESPERA",
+            "LOS CINCO REINOS TE OBSERVAN",
+            "BIENVENIDO, ELEGIDO"
+        ];
+        
+        setInterval(() => {
+            const randomMsg = mensajes[Math.floor(Math.random() * mensajes.length)];
+            bienvenida.style.animation = 'none';
+            bienvenida.offsetHeight;
+            bienvenida.style.animation = 'parpadearBienvenida 1.5s infinite alternate';
+            bienvenida.textContent = randomMsg;
+        }, 5000);
+
+        // Efecto de movimiento con mouse
+        let mouseX = 0, mouseY = 0;
+        const contenedor = document.getElementById('contenedor');
+        
+        document.addEventListener('mousemove', function(e) {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 20;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 20;
+            contenedor.style.transform = `translate(${mouseX * 0.1}px, ${mouseY * 0.1}px)`;
+        });
+
+        actualizarSeleccion();
+    </script>
+</body>
+</html>

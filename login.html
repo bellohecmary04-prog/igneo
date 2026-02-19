@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÍGNEO - ACCESO AL PERSONAJE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        @font-face {
+            font-family: 'Determination';
+            src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Press Start 2P', monospace;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fondo-estrellas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            z-index: 0;
+        }
+
+        .estrella {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            animation: parpadear 2s infinite alternate;
+        }
+
+        @keyframes parpadear {
+            from { opacity: 0.2; }
+            to { opacity: 1; }
+        }
+
+        .particula-color {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: flotarColor 8s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes flotarColor {
+            0% { transform: translateY(0) translateX(0); opacity: 0.8; }
+            100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
+        }
+
+        .contenedor {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            width: 100%;
+            background: #000000;
+            border: 6px solid #ffffff;
+            box-shadow: 0 0 0 6px #000000, 0 0 0 12px #7f7f7f;
+            padding: 40px 30px;
+            animation: aparecer 0.5s steps(10) forwards;
+        }
+
+        @keyframes aparecer {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffff00;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-shadow: 4px 4px 0 #ff0000;
+            letter-spacing: 4px;
+        }
+
+        .linea {
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ffffff, #ffff00, #ffffff, transparent);
+            margin: 20px 0;
+            animation: moverLinea 3s infinite;
+        }
+
+        @keyframes moverLinea {
+            0% { background-position: -200px; }
+            100% { background-position: 200px; }
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #7f7f7f;
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #7f7f7f;
+            padding-bottom: 20px;
+        }
+
+        .formulario {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .campo {
+            margin-bottom: 30px;
+        }
+
+        .campo label {
+            display: block;
+            color: #ffff00;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+
+        .campo input, .campo select {
+            width: 100%;
+            background: #0a0a1a;
+            border: 4px solid #7f7f7f;
+            color: #00ff00;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            padding: 15px;
+            outline: none;
+        }
+
+        .campo input:focus, .campo select:focus {
+            border-color: #ffff00;
+        }
+
+        .campo input::placeholder {
+            color: #3f3f3f;
+            font-size: 0.6rem;
+        }
+
+        .btn {
+            width: 100%;
+            background: #1a1a2a;
+            border: 6px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.2rem;
+            padding: 20px;
+            cursor: pointer;
+            box-shadow: 8px 8px 0 #0a0a1a;
+            transition: all 0.05s step-end;
+            margin: 30px 0 20px;
+        }
+
+        .btn:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0 #0a0a1a;
+        }
+
+        .btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 #0a0a1a;
+        }
+
+        .mensaje {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px;
+            background: #000000;
+            border-width: 6px;
+            border-style: solid;
+            z-index: 1000;
+            text-align: center;
+            line-height: 2;
+            animation: aparecerMensaje 0.2s steps(5);
+        }
+
+        .mensaje.error {
+            border-color: #ff0000;
+            background: #330000;
+            color: white;
+        }
+
+        .mensaje.exito {
+            border-color: #00ff00;
+            background: #003300;
+            color: white;
+        }
+
+        @keyframes aparecerMensaje {
+            from { transform: translate(-50%, -50%) scale(0); }
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes temblor {
+            0%,100% { transform: translateX(0); }
+            10%,30%,50%,70%,90% { transform: translateX(-5px); }
+            20%,40%,60%,80% { transform: translateX(5px); }
+        }
+
+        .temblor {
+            animation: temblor 0.3s steps(5);
+        }
+
+        .footer {
+            text-align: center;
+            color: #7f7f7f;
+            font-size: 0.7rem;
+            margin-top: 30px;
+            border-top: 2px solid #7f7f7f;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="fondo-estrellas" id="fondo"></div>
+    <div id="particulas"></div>
+
+    <div class="contenedor" id="contenedor">
+        <h1>Í G N E O</h1>
+        <div class="linea"></div>
+        <div class="subtitulo">ACCESO AL PERSONAJE</div>
+
+        <div class="formulario">
+            <div class="campo">
+                <label>NOMBRE DEL PERSONAJE</label>
+                <input type="text" id="nombrePersonaje" placeholder="ej: Kaelen Fenrir">
+            </div>
+
+            <div class="campo">
+                <label>CASTA / RANGO</label>
+                <select id="rango">
+                    <option value="">SELECCIONAR</option>
+                    <option>Rango I: Divino</option>
+                    <option>Rango II: Alta Nobleza</option>
+                    <option>Rango III: Nobleza/Gobierno</option>
+                    <option>Rango IV: Élite/Protector</option>
+                    <option>Rango V: Ciudadano/Guerrero</option>
+                    <option>Rango VI: Común/Sirviente</option>
+                    <option>Rango VII: Inferior/Exiliado</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label>LLAVE ÚNICA DE ACCESO</label>
+                <input type="text" id="llaveUnica" placeholder="XXX-XXX-XXX">
+            </div>
+
+            <button class="btn" id="btnAcceder">▶ ACCEDER ◀</button>
+        </div>
+
+        <div class="footer">
+            * SOLO LOS DIGNOS TRASPASAN ESTE UMBRAL *
+        </div>
+    </div>
+
+    <script>
+        // Generar estrellas
+        const fondo = document.getElementById('fondo');
+        for (let i = 0; i < 200; i++) {
+            const estrella = document.createElement('div');
+            estrella.className = 'estrella';
+            estrella.style.left = Math.random() * 100 + '%';
+            estrella.style.top = Math.random() * 100 + '%';
+            estrella.style.animationDelay = Math.random() * 3 + 's';
+            fondo.appendChild(estrella);
+        }
+
+        // Generar partículas arcoíris
+        const particulas = document.getElementById('particulas');
+        const colores = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff', '#ff00ff'];
+        
+        for (let i = 0; i < 50; i++) {
+            const p = document.createElement('div');
+            p.className = 'particula-color';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.background = colores[Math.floor(Math.random() * colores.length)];
+            p.style.animationDelay = Math.random() * 5 + 's';
+            p.style.animationDuration = (5 + Math.random() * 10) + 's';
+            particulas.appendChild(p);
+        }
+
+        const contenedor = document.getElementById('contenedor');
+        const nombreInput = document.getElementById('nombrePersonaje');
+        const rangoSelect = document.getElementById('rango');
+        const llaveInput = document.getElementById('llaveUnica');
+        const btnAcceder = document.getElementById('btnAcceder');
+
+        function mostrarMensaje(texto, tipo) {
+            const mensaje = document.createElement('div');
+            mensaje.className = 'mensaje ' + tipo;
+            mensaje.textContent = texto;
+            document.body.appendChild(mensaje);
+            setTimeout(() => mensaje.remove(), 3000);
+        }
+
+        // Simulación de personajes aprobados (esto luego se conectará a Supabase)
+        const personajesAprobados = {
+            'KAELEN FENRIR': { rango: 'Rango IV: Élite/Protector', llave: 'FEN-123-RIX' },
+            'LUMINA HADA': { rango: 'Rango V: Ciudadano/Guerrero', llave: 'LUM-456-HAD' },
+            'DRAKTHAR': { rango: 'Rango IV: Élite/Protector', llave: 'DRA-789-KIN' }
+        };
+
+        btnAcceder.addEventListener('click', function() {
+            const nombre = nombreInput.value.trim().toUpperCase();
+            const rango = rangoSelect.value;
+            const llave = llaveInput.value.trim();
+
+            if (!nombre || !rango || !llave) {
+                mostrarMensaje('COMPLETA TODOS LOS CAMPOS', 'error');
+                contenedor.classList.add('temblor');
+                setTimeout(() => contenedor.classList.remove('temblor'), 300);
+                return;
+            }
+
+            const personaje = personajesAprobados[nombre];
+
+            if (personaje && personaje.rango === rango && personaje.llave === llave) {
+                mostrarMensaje(`✨ BIENVENIDO, ${nombre} ✨`, 'exito');
+                
+                setTimeout(() => {
+                    window.location.href = 'menu-desbloqueado.html';
+                }, 2000);
+            } else {
+                mostrarMensaje('❌ CREDENCIALES INCORRECTAS', 'error');
+                contenedor.classList.add('temblor');
+                setTimeout(() => contenedor.classList.remove('temblor'), 300);
+                llaveInput.value = '';
+                llaveInput.focus();
+            }
+        });
+
+        // Permitir Enter
+        llaveInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                btnAcceder.click();
+            }
+        });
+    </script>
+</body>
+</html>

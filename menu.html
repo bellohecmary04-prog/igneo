@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÍGNEO - SALA DEL CONSEJO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        @font-face {
+            font-family: 'Determination';
+            src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Press Start 2P', monospace;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fondo-estrellas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            z-index: 0;
+        }
+
+        .estrella {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            animation: parpadear 2s infinite alternate;
+        }
+
+        @keyframes parpadear {
+            from { opacity: 0.2; }
+            to { opacity: 1; }
+        }
+
+        .contenedor {
+            position: relative;
+            z-index: 10;
+            max-width: 1000px;
+            width: 100%;
+            background: #000000;
+            border: 6px solid #ffffff;
+            box-shadow: 0 0 0 6px #000000, 0 0 0 12px #7f7f7f;
+            padding: 40px 30px;
+            animation: aparecer 0.5s steps(10) forwards;
+        }
+
+        @keyframes aparecer {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffff00;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-shadow: 4px 4px 0 #ff0000;
+            letter-spacing: 4px;
+        }
+
+        .linea {
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ffffff, #ffff00, #ffffff, transparent);
+            margin: 20px 0;
+            animation: moverLinea 3s infinite;
+        }
+
+        @keyframes moverLinea {
+            0% { background-position: -200px; }
+            100% { background-position: 200px; }
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #7f7f7f;
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #7f7f7f;
+            padding-bottom: 20px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .opcion {
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #ffffff;
+            transition: all 0.05s step-end;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .opcion:hover {
+            border-color: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 #2a2a3a;
+        }
+
+        .opcion:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 #2a2a3a;
+        }
+
+        .opcion.formulario {
+            border-color: #00ff00;
+            background: #003300;
+        }
+
+        .opcion.formulario:hover {
+            background: #004400;
+        }
+
+        .opcion.bloqueada {
+            background: #0a0a1a;
+            border-color: #3f3f3f;
+            color: #5f5f5f;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .opcion.bloqueada::after {
+            content: "✗";
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: #ff0000;
+            font-size: 1.2rem;
+            animation: parpadearEquis 1s infinite;
+        }
+
+        @keyframes parpadearEquis {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        .footer {
+            text-align: center;
+            color: #7f7f7f;
+            font-size: 0.8rem;
+            margin-top: 30px;
+            border-top: 2px solid #7f7f7f;
+            padding-top: 20px;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-content {
+            background: #000000;
+            border: 6px solid #ff0000;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .popup-content p {
+            color: #ff0000;
+            margin-bottom: 30px;
+            line-height: 2;
+        }
+
+        .popup-content button {
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            color: white;
+            padding: 15px 30px;
+            font-family: 'Press Start 2P', monospace;
+            cursor: pointer;
+        }
+
+        .popup-content button:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="fondo-estrellas" id="fondo"></div>
+
+    <div class="contenedor">
+        <h1>Í G N E O</h1>
+        <div class="linea"></div>
+        <div class="subtitulo">SALA DEL CONSEJO - ASPIRANTE</div>
+
+        <div class="menu-grid">
+            <div class="opcion formulario" onclick="window.location.href='formulario.html'">
+                FORMULARIO
+            </div>
+            <div class="opcion bloqueada" onclick="mostrarPopup()">
+                PERSONAJE
+            </div>
+            <div class="opcion bloqueada" onclick="mostrarPopup()">
+                INVENTARIO
+            </div>
+            <div class="opcion bloqueada" onclick="mostrarPopup()">
+                TIENDA
+            </div>
+            <div class="opcion bloqueada" onclick="mostrarPopup()">
+                MUNDO
+            </div>
+            <div class="opcion bloqueada" onclick="mostrarPopup()">
+                TRABAJO
+            </div>
+        </div>
+
+        <div class="footer">
+            * SOLO LOS DIGNOS PUEDEN ACCEDER *
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popup">
+        <div class="popup-content">
+            <p>⛔ ACCESO RESTRINGIDO ⛔<br><br>DEBES COMPLETAR EL FORMULARIO Y SER APROBADO PRIMERO.</p>
+            <button onclick="cerrarPopup()">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <script>
+        // Generar estrellas
+        const fondo = document.getElementById('fondo');
+        for (let i = 0; i < 150; i++) {
+            const estrella = document.createElement('div');
+            estrella.className = 'estrella';
+            estrella.style.left = Math.random() * 100 + '%';
+            estrella.style.top = Math.random() * 100 + '%';
+            estrella.style.animationDelay = Math.random() * 3 + 's';
+            fondo.appendChild(estrella);
+        }
+
+        function mostrarPopup() {
+            document.getElementById('popup').style.display = 'flex';
+        }
+
+        function cerrarPopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

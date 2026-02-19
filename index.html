@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÍGNEO - ACCESO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><rect width="16" height="16" fill="white" /></svg>') 0 0, auto;
+        }
+
+        @font-face {
+            font-family: 'Determination';
+            src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Press Start 2P', monospace;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fondo-estrellas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            z-index: 0;
+        }
+
+        .estrella {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            animation: parpadear 2s infinite alternate;
+        }
+
+        @keyframes parpadear {
+            from { opacity: 0.2; }
+            to { opacity: 1; }
+        }
+
+        .particula-color {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: flotarColor 8s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes flotarColor {
+            0% { transform: translateY(0) translateX(0); opacity: 0.8; }
+            100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
+        }
+
+        .contenedor {
+            position: relative;
+            z-index: 10;
+            max-width: 700px;
+            width: 90%;
+            background: #000000;
+            border: 6px solid #ffffff;
+            box-shadow: 0 0 0 6px #000000, 0 0 0 12px #7f7f7f;
+            padding: 40px 30px;
+            animation: aparecer 0.8s steps(12) forwards;
+        }
+
+        @keyframes aparecer {
+            0% { transform: scale(0.8) rotate(-5deg); opacity: 0; border-color: #ffff00; }
+            30% { transform: scale(1.05) rotate(2deg); border-color: #ffffff; }
+            60% { transform: scale(0.98) rotate(-1deg); }
+            100% { transform: scale(1) rotate(0); opacity: 1; border-color: #ffffff; }
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffff00;
+            font-size: 3rem;
+            margin-bottom: 30px;
+            text-shadow: 4px 4px 0 #ff0000, 8px 8px 0 #0000ff;
+            letter-spacing: 5px;
+            animation: brillarTitulo 2s infinite alternate;
+        }
+
+        @keyframes brillarTitulo {
+            from { text-shadow: 4px 4px 0 #ff0000, 8px 8px 0 #0000ff; }
+            to { text-shadow: 6px 6px 0 #ff6666, 10px 10px 0 #6666ff; }
+        }
+
+        .pregunta {
+            text-align: center;
+            color: #7f7f7f;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            line-height: 1.8;
+            animation: parpadearTexto 2s infinite alternate;
+        }
+
+        @keyframes parpadearTexto {
+            from { opacity: 0.7; }
+            to { opacity: 1; text-shadow: 0 0 5px #ffff00; }
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .input-key {
+            width: 80%;
+            padding: 20px;
+            background: #0a0a1a;
+            border: 4px solid #7f7f7f;
+            color: #00ff00;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.2rem;
+            text-align: center;
+            outline: none;
+            box-shadow: 8px 8px 0 #2a2a3a;
+        }
+
+        .input-key:focus {
+            border-color: #ffff00;
+        }
+
+        .btn {
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.5rem;
+            padding: 20px 40px;
+            cursor: pointer;
+            box-shadow: 8px 8px 0 #2a2a3a;
+            transition: all 0.05s step-end;
+        }
+
+        .btn:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0 #2a2a3a;
+        }
+
+        .btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 #2a2a3a;
+        }
+
+        .intentos-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .intento {
+            width: 30px;
+            height: 30px;
+            border: 4px solid #7f7f7f;
+            background: #0a0a1a;
+            transition: all 0.1s step-end;
+        }
+
+        .intento-usado {
+            background: #ff0000;
+            border-color: #ffff00;
+            animation: latir 0.5s infinite alternate;
+        }
+
+        .intento-restante {
+            background: #00ff00;
+            border-color: #ffff00;
+        }
+
+        @keyframes latir {
+            from { transform: scale(1); opacity: 0.8; }
+            to { transform: scale(1.2); opacity: 1; }
+        }
+
+        .mensaje-bloqueo {
+            color: #ff0000;
+            font-size: 1rem;
+            margin-top: 20px;
+            animation: parpadearBloqueo 1s infinite;
+        }
+
+        @keyframes parpadearBloqueo {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; text-shadow: 0 0 10px #ff0000; }
+            100% { opacity: 0.5; }
+        }
+
+        .mensaje {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px;
+            background: #000000;
+            border-width: 4px;
+            border-style: solid;
+            z-index: 1000;
+            text-align: center;
+            line-height: 2;
+            font-size: 1rem;
+            animation: aparecerMensaje 0.2s steps(8);
+        }
+
+        .mensaje.error {
+            border-color: #ff0000;
+            background: #330000;
+            color: white;
+        }
+
+        .mensaje.exito {
+            border-color: #00ff00;
+            background: #003300;
+            color: white;
+        }
+
+        @keyframes aparecerMensaje {
+            from { transform: translate(-50%, -50%) scale(0); }
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes temblor {
+            0%,100% { transform: translateX(0); }
+            10%,30%,50%,70%,90% { transform: translateX(-10px); }
+            20%,40%,60%,80% { transform: translateX(10px); }
+        }
+
+        .temblor {
+            animation: temblor 0.3s steps(5);
+        }
+    </style>
+</head>
+<body>
+    <div class="fondo-estrellas" id="fondo"></div>
+    <div id="particulas"></div>
+
+    <div class="contenedor" id="contenedor">
+        <h1>ÍGNEO</h1>
+        
+        <div class="pregunta">
+            ¿CUÁL ES LA LLAVE DE ACCESO?
+        </div>
+
+        <div class="input-container">
+            <input type="text" class="input-key" id="llaveInput" placeholder="IG-NEO" autocomplete="off">
+            <button class="btn" id="btnAcceder">▶ ACCEDER ◀</button>
+        </div>
+
+        <div class="intentos-container" id="intentosContainer">
+            <div class="intento" id="intento1"></div>
+            <div class="intento" id="intento2"></div>
+            <div class="intento" id="intento3"></div>
+        </div>
+
+        <div id="mensajeBloqueo" class="mensaje-bloqueo" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Generar estrellas
+        const fondo = document.getElementById('fondo');
+        for (let i = 0; i < 200; i++) {
+            const estrella = document.createElement('div');
+            estrella.className = 'estrella';
+            estrella.style.left = Math.random() * 100 + '%';
+            estrella.style.top = Math.random() * 100 + '%';
+            estrella.style.animationDelay = Math.random() * 3 + 's';
+            fondo.appendChild(estrella);
+        }
+
+        // Generar partículas arcoíris
+        const particulas = document.getElementById('particulas');
+        const colores = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff', '#ff00ff'];
+        
+        for (let i = 0; i < 50; i++) {
+            const p = document.createElement('div');
+            p.className = 'particula-color';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.background = colores[Math.floor(Math.random() * colores.length)];
+            p.style.animationDelay = Math.random() * 5 + 's';
+            p.style.animationDuration = (5 + Math.random() * 10) + 's';
+            particulas.appendChild(p);
+        }
+
+        // Sistema de 3 intentos
+        const LLAVE_CORRECTA = "IG-NEO";
+        let intentosRestantes = 3;
+        let bloqueado = false;
+        
+        const intento1 = document.getElementById('intento1');
+        const intento2 = document.getElementById('intento2');
+        const intento3 = document.getElementById('intento3');
+        const llaveInput = document.getElementById('llaveInput');
+        const btnAcceder = document.getElementById('btnAcceder');
+        const contenedor = document.getElementById('contenedor');
+        const mensajeBloqueo = document.getElementById('mensajeBloqueo');
+
+        function actualizarIntentos() {
+            const intentos = [intento1, intento2, intento3];
+            for (let i = 0; i < 3; i++) {
+                intentos[i].className = 'intento';
+                if (i < intentosRestantes) {
+                    intentos[i].classList.add('intento-restante');
+                } else {
+                    intentos[i].classList.add('intento-usado');
+                }
+            }
+        }
+
+        function mostrarMensaje(texto, tipo) {
+            const mensaje = document.createElement('div');
+            mensaje.className = 'mensaje ' + tipo;
+            mensaje.textContent = texto;
+            document.body.appendChild(mensaje);
+            setTimeout(() => mensaje.remove(), 3000);
+        }
+
+        function bloquearPermanente() {
+            bloqueado = true;
+            llaveInput.disabled = true;
+            btnAcceder.disabled = true;
+            mensajeBloqueo.style.display = 'block';
+            mensajeBloqueo.textContent = '⛔ ACCESO BLOQUEADO PERMANENTEMENTE ⛔';
+            
+            mostrarMensaje('⛔ HAS AGOTADO LOS 3 INTENTOS. EL SISTEMA SE HA BLOQUEADO.', 'error');
+        }
+
+        btnAcceder.addEventListener('click', function() {
+            if (bloqueado) return;
+            
+            const llaveIngresada = llaveInput.value.trim().toUpperCase();
+            
+            if (llaveIngresada === LLAVE_CORRECTA) {
+                mostrarMensaje('✨ ACCESO CONCEDIDO. BIENVENIDO A ÍGNEO ✨', 'exito');
+                
+                contenedor.style.animation = 'none';
+                contenedor.offsetHeight;
+                contenedor.style.animation = 'aparecer 0.5s steps(8)';
+                
+                setTimeout(() => {
+                    window.location.href = 'menu.html';
+                }, 2000);
+                
+            } else {
+                intentosRestantes--;
+                actualizarIntentos();
+                
+                contenedor.classList.add('temblor');
+                setTimeout(() => {
+                    contenedor.classList.remove('temblor');
+                }, 300);
+                
+                mostrarMensaje(`❌ LLAVE INCORRECTA. TE QUEDAN ${intentosRestantes} INTENTOS.`, 'error');
+                
+                llaveInput.value = '';
+                llaveInput.focus();
+                
+                if (intentosRestantes === 0) {
+                    bloquearPermanente();
+                }
+            }
+        });
+
+        llaveInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !bloqueado) {
+                btnAcceder.click();
+            }
+        });
+
+        actualizarIntentos();
+    </script>
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÍGNEO - TIENDAS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        @font-face {
+            font-family: 'Determination';
+            src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Press Start 2P', monospace;
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .fondo-estrellas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            z-index: 0;
+        }
+
+        .estrella {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            animation: parpadear 2s infinite alternate;
+        }
+
+        @keyframes parpadear {
+            from { opacity: 0.2; }
+            to { opacity: 1; }
+        }
+
+        .particula-color {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: flotarColor 8s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes flotarColor {
+            0% { transform: translateY(0) translateX(0); opacity: 0.8; }
+            100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
+        }
+
+        .contenedor {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #000000;
+            border: 6px solid #ffffff;
+            box-shadow: 0 0 0 6px #000000, 0 0 0 12px #7f7f7f;
+            padding: 30px;
+            animation: aparecer 0.5s steps(10) forwards;
+        }
+
+        @keyframes aparecer {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffff00;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 0 #ff0000;
+        }
+
+        .linea {
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ffffff, #ffff00, #ffffff, transparent);
+            margin: 20px 0;
+            animation: moverLinea 3s infinite;
+        }
+
+        @keyframes moverLinea {
+            0% { background-position: -200px; }
+            100% { background-position: 200px; }
+        }
+
+        /* Info superior: saldo del personaje */
+        .info-superior {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .saldo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .saldo .etiqueta {
+            color: #ffff00;
+            font-size: 0.8rem;
+        }
+
+        .saldo .valor {
+            color: #00ff00;
+            font-size: 1.2rem;
+        }
+
+        .personaje-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        .personaje-info span {
+            color: #7f7f7f;
+            font-size: 0.7rem;
+        }
+
+        .personaje-info strong {
+            color: #00ff00;
+            margin-left: 5px;
+        }
+
+        /* Grid de tiendas */
+        .tiendas-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .tienda-card {
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.05s step-end;
+            position: relative;
+            box-shadow: 8px 8px 0 #2a2a3a;
+        }
+
+        .tienda-card:hover {
+            border-color: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0 #2a2a3a;
+        }
+
+        .tienda-card:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 #2a2a3a;
+        }
+
+        .tienda-card.bloqueada {
+            opacity: 0.5;
+            filter: grayscale(80%);
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .tienda-card.bloqueada::after {
+            content: "🔒";
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            color: #ff0000;
+        }
+
+        .tienda-nombre {
+            color: #ffff00;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #7f7f7f;
+            padding-bottom: 10px;
+        }
+
+        .tienda-tipo {
+            color: #7f7f7f;
+            font-size: 0.7rem;
+            margin-bottom: 15px;
+        }
+
+        .tienda-descripcion {
+            color: white;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .tienda-eslogan {
+            color: #00ff00;
+            font-size: 0.7rem;
+            font-style: italic;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #0a0a1a;
+            border: 2px solid #7f7f7f;
+        }
+
+        .tienda-ambiente {
+            color: #7f7f7f;
+            font-size: 0.6rem;
+            line-height: 1.4;
+        }
+
+        /* Mensaje de reino */
+        .reino-info {
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .reino-info .reino-nombre {
+            color: #ffff00;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .reino-info .reino-desc {
+            color: #7f7f7f;
+            font-size: 0.7rem;
+        }
+
+        /* Botón volver */
+        .btn-volver {
+            display: block;
+            width: 200px;
+            margin: 30px auto 10px;
+            padding: 15px;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 8px 8px 0 #0a0a1a;
+            transition: all 0.05s step-end;
+        }
+
+        .btn-volver:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0 #0a0a1a;
+        }
+
+        .btn-volver:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 #0a0a1a;
+        }
+
+        @media (max-width: 800px) {
+            .tiendas-grid { grid-template-columns: 1fr; }
+            .info-superior { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="fondo-estrellas" id="fondo"></div>
+    <div id="particulas"></div>
+
+    <div class="contenedor">
+        <h1>TIENDAS DE ÍGNEO</h1>
+        <div class="linea"></div>
+
+        <!-- Info superior con saldo y personaje -->
+        <div class="info-superior">
+            <div class="saldo">
+                <span class="etiqueta">CRISTALES DE ÉTER:</span>
+                <span class="valor" id="cristales">2,450 💎</span>
+            </div>
+            <div class="personaje-info">
+                <span>REINO: <strong id="reino-personaje">KAIDOM</strong></span>
+                <span>RANGO: <strong id="rango-personaje">RANGO IV</strong></span>
+            </div>
+        </div>
+
+        <!-- Información del reino actual -->
+        <div class="reino-info" id="reino-info">
+            <div class="reino-nombre" id="reino-nombre">REINO DE KAIDOM</div>
+            <div class="reino-desc" id="reino-desc">Reino Acuático, donde las olas susurran secretos antiguos.</div>
+        </div>
+
+        <!-- Grid de tiendas -->
+        <div class="tiendas-grid" id="tiendas-grid">
+            <!-- Las tiendas se cargarán aquí con JavaScript -->
+        </div>
+
+        <!-- Botón volver -->
+        <button class="btn-volver" onclick="window.location.href='menu-desbloqueado.html'">
+            VOLVER AL MENÚ
+        </button>
+    </div>
+
+    <script>
+        // Generar estrellas
+        const fondo = document.getElementById('fondo');
+        for (let i = 0; i < 150; i++) {
+            const estrella = document.createElement('div');
+            estrella.className = 'estrella';
+            estrella.style.left = Math.random() * 100 + '%';
+            estrella.style.top = Math.random() * 100 + '%';
+            estrella.style.animationDelay = Math.random() * 3 + 's';
+            fondo.appendChild(estrella);
+        }
+
+        // Generar partículas arcoíris
+        const particulas = document.getElementById('particulas');
+        const colores = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff', '#ff00ff'];
+        
+        for (let i = 0; i < 50; i++) {
+            const p = document.createElement('div');
+            p.className = 'particula-color';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.background = colores[Math.floor(Math.random() * colores.length)];
+            p.style.animationDelay = Math.random() * 5 + 's';
+            p.style.animationDuration = (5 + Math.random() * 10) + 's';
+            particulas.appendChild(p);
+        }
+
+        // Datos del personaje (simulados - después vendrán de Supabase)
+        const personajeData = {
+            nombre: 'KAELEN FENRIR',
+            reino: 'KAIDOM',
+            rango: 'RANGO IV',
+            cristales: 2450
+        };
+
+        // Datos de las 5 tiendas (cargadas desde Supabase)
+        const tiendasData = [
+            {
+                id: 1,
+                nombre: 'El Cáliz Eterno',
+                tipo: 'Consumibles',
+                descripcion: 'Pociones, elixires, carnes místicas y frutas del Nemeton. Todo lo que se bebe o se come para alterar las estadísticas.',
+                eslogan: '"Lo que el cuerpo necesita, el alma lo consume."',
+                ambiente: 'Un aroma a hierbas frescas y frascos de cristal que brillan con luz propia.',
+                disponible: true,
+                imagen: '🧪'
+            },
+            {
+                id: 2,
+                nombre: 'Reliquias del Alba',
+                tipo: 'Sagrados',
+                descripcion: 'Objetos únicos, huevos de fénix, ojos de la verdad, contratos de almas y mapas omniscientes. Son objetos de altísimo poder y precio.',
+                eslogan: '"Para aquellos que buscan lo que no debe ser encontrado."',
+                ambiente: 'Un silencio sepulcral, con pedestales de terciopelo y guardias de piedra.',
+                disponible: true,
+                imagen: '👑'
+            },
+            {
+                id: 3,
+                nombre: 'El Yunque Cenizo',
+                tipo: 'Equipo',
+                descripcion: 'Armas (espadas, dagas, hachas) y armaduras (capas, botas aladas, cascos). Todo lo que un guerrero se pone encima para la batalla.',
+                eslogan: '"Tu piel será acero; tu mano, la muerte."',
+                ambiente: 'Calor intenso, chispas saltando y el sonido constante del martillo contra el metal.',
+                disponible: true,
+                imagen: '⚔️'
+            },
+            {
+                id: 4,
+                nombre: 'Esencia Pura',
+                tipo: 'Materiales',
+                descripcion: 'Lingotes de hierro negro, polvo de diamante, aceites mágicos y cuero de quimera. Aquí vienen los que quieren crear sus propios objetos (Crafteo).',
+                eslogan: '"La base de toda grandeza nace de la tierra."',
+                ambiente: 'Estanterías llenas de materias primas brutas, rocas brillantes y metales pesados.',
+                disponible: true,
+                imagen: '⛓️'
+            },
+            {
+                id: 5,
+                nombre: 'El Bazar Umbrío',
+                tipo: 'Misceláneos',
+                descripcion: 'Brújulas, llaves de cristal, pergaminos de teletransporte y objetos extraños que no son armas ni comida, pero son vitales.',
+                eslogan: '"Lo que no sabías que necesitabas está justo aquí."',
+                ambiente: 'Una tienda desordenada llena de curiosidades mecánicas y objetos extraños.',
+                disponible: true,
+                imagen: '🧭'
+            }
+        ];
+
+        // Información de los reinos
+        const reinosData = {
+            'KAIDOM': {
+                nombre: 'REINO DE KAIDOM',
+                desc: 'Reino Acuático, donde las olas susurran secretos antiguos.'
+            },
+            'ASTRALITH-VANDERMERE': {
+                nombre: 'REINO DE ASTRALITH-VANDERMERE',
+                desc: 'Reino Celestial, donde las nubes guardan los sueños de los antiguos.'
+            },
+            'NORUM DOMINAI': {
+                nombre: 'REINO DE NORUM DOMINAI',
+                desc: 'Reino Infernal, donde el fuego eterno forja almas guerreras.'
+            },
+            'THANATROR': {
+                nombre: 'REINO DE THANATROR',
+                desc: 'Reino Sombrío, donde la muerte susurra al oído de los valientes.'
+            },
+            'BALNATH': {
+                nombre: 'REINO DE BALNATH',
+                desc: 'Reino de la Tierra, donde las montañas guardan secretos milenarios.'
+            }
+        };
+
+        // Actualizar info del personaje
+        document.getElementById('cristales').textContent = personajeData.cristales.toLocaleString() + ' 💎';
+        document.getElementById('reino-personaje').textContent = personajeData.reino;
+        document.getElementById('rango-personaje').textContent = personajeData.rango;
+
+        // Actualizar info del reino
+        const reinoActual = reinosData[personajeData.reino] || reinosData['KAIDOM'];
+        document.getElementById('reino-nombre').textContent = reinoActual.nombre;
+        document.getElementById('reino-desc').textContent = reinoActual.desc;
+
+        // Cargar tiendas
+        function cargarTiendas() {
+            const grid = document.getElementById('tiendas-grid');
+            grid.innerHTML = '';
+
+            tiendasData.forEach(tienda => {
+                const card = document.createElement('div');
+                card.className = `tienda-card ${!tienda.disponible ? 'bloqueada' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="tienda-nombre">${tienda.imagen} ${tienda.nombre}</div>
+                    <div class="tienda-tipo">${tienda.tipo}</div>
+                    <div class="tienda-descripcion">${tienda.descripcion}</div>
+                    <div class="tienda-eslogan">${tienda.eslogan}</div>
+                    <div class="tienda-ambiente">${tienda.ambiente}</div>
+                `;
+
+                if (tienda.disponible) {
+                    card.onclick = () => {
+                        window.location.href = `tienda-detalle.html?id=${tienda.id}`;
+                    };
+                }
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Cargar tiendas al inicio
+        cargarTiendas();
+    </script>
+</body>
+</html>

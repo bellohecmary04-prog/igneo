@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÍGNEO - TRABAJOS Y MISIONES</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        @font-face {
+            font-family: 'Determination';
+            src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Press Start 2P', monospace;
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .fondo-estrellas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            z-index: 0;
+        }
+
+        .estrella {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            animation: parpadear 2s infinite alternate;
+        }
+
+        @keyframes parpadear {
+            from { opacity: 0.2; }
+            to { opacity: 1; }
+        }
+
+        .particula-color {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: flotarColor 8s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes flotarColor {
+            0% { transform: translateY(0) translateX(0); opacity: 0.8; }
+            100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
+        }
+
+        .contenedor {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #000000;
+            border: 6px solid #ffffff;
+            box-shadow: 0 0 0 6px #000000, 0 0 0 12px #7f7f7f;
+            padding: 30px;
+            animation: aparecer 0.5s steps(10) forwards;
+        }
+
+        @keyframes aparecer {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffff00;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 0 #ff0000;
+        }
+
+        .linea {
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ffffff, #ffff00, #ffffff, transparent);
+            margin: 20px 0;
+            animation: moverLinea 3s infinite;
+        }
+
+        @keyframes moverLinea {
+            0% { background-position: -200px; }
+            100% { background-position: 200px; }
+        }
+
+        /* Info superior: personaje y cristales */
+        .info-superior {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .personaje-info {
+            display: flex;
+            gap: 30px;
+        }
+
+        .personaje-info div {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .personaje-info .label {
+            color: #7f7f7f;
+            font-size: 0.6rem;
+        }
+
+        .personaje-info .valor {
+            color: #00ff00;
+            font-size: 0.9rem;
+        }
+
+        .cristales {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cristales .label {
+            color: #ffff00;
+            font-size: 0.8rem;
+        }
+
+        .cristales .valor {
+            color: #00ff00;
+            font-size: 1.2rem;
+        }
+
+        /* Filtros */
+        .filtros {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filtro {
+            flex: 1;
+            min-width: 150px;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+            padding: 12px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .filtro.activo {
+            background: #2a2a3a;
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        .filtro:hover {
+            border-color: #ffff00;
+        }
+
+        /* Grid de trabajos */
+        .trabajos-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .trabajo-card {
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.05s step-end;
+            position: relative;
+        }
+
+        .trabajo-card:hover {
+            border-color: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 #2a2a3a;
+        }
+
+        .trabajo-card:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 #2a2a3a;
+        }
+
+        .trabajo-card.completado {
+            opacity: 0.6;
+            filter: grayscale(80%);
+            cursor: default;
+        }
+
+        .trabajo-card.completado:hover {
+            border-color: #7f7f7f;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .trabajo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #7f7f7f;
+            padding-bottom: 10px;
+        }
+
+        .trabajo-titulo {
+            color: #ffff00;
+            font-size: 1rem;
+        }
+
+        .trabajo-dificultad {
+            display: flex;
+            gap: 3px;
+        }
+
+        .estrella {
+            color: #7f7f7f;
+            font-size: 0.8rem;
+        }
+
+        .estrella.activa {
+            color: #ffff00;
+        }
+
+        .trabajo-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            background: #0a0a1a;
+            border: 2px solid #7f7f7f;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .info-item .label {
+            color: #7f7f7f;
+            font-size: 0.5rem;
+            margin-bottom: 5px;
+        }
+
+        .info-item .value {
+            color: #00ff00;
+            font-size: 0.7rem;
+        }
+
+        .trabajo-recompensa {
+            background: #0a0a1a;
+            border: 3px solid #ffff00;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .recompensa-dinero {
+            color: #ffff00;
+            font-size: 0.9rem;
+        }
+
+        .recompensa-objeto {
+            color: #00ff00;
+            font-size: 0.7rem;
+        }
+
+        .btn-aceptar {
+            width: 100%;
+            margin-top: 15px;
+            padding: 15px;
+            background: #003300;
+            border: 4px solid #00ff00;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .btn-aceptar:hover {
+            background: #004400;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #00ff00;
+        }
+
+        .btn-aceptar:active {
+            transform: translate(4px, 4px);
+            box-shadow: none;
+        }
+
+        .btn-aceptar.completado {
+            background: #330000;
+            border-color: #ff0000;
+            cursor: not-allowed;
+        }
+
+        /* Sección de trabajos activos */
+        .activos-section {
+            margin-top: 40px;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            padding: 20px;
+        }
+
+        .activos-header {
+            color: #ffff00;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #7f7f7f;
+            padding-bottom: 10px;
+        }
+
+        .activos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .activo-card {
+            background: #0a0a1a;
+            border: 3px solid #7f7f7f;
+            padding: 15px;
+        }
+
+        .activo-titulo {
+            color: #00ff00;
+            font-size: 0.7rem;
+            margin-bottom: 10px;
+        }
+
+        .activo-progreso {
+            margin: 10px 0;
+            height: 20px;
+            background: #1a1a2a;
+            border: 2px solid #7f7f7f;
+            overflow: hidden;
+        }
+
+        .progreso-barra {
+            height: 100%;
+            background: #00ff00;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .activo-info {
+            display: flex;
+            justify-content: space-between;
+            color: #7f7f7f;
+            font-size: 0.5rem;
+            margin-top: 10px;
+        }
+
+        /* Modal de detalle */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #000000;
+            border: 6px solid #ffff00;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h2 {
+            color: #ffff00;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-descripcion {
+            color: white;
+            font-size: 0.8rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #1a1a2a;
+            border: 3px solid #7f7f7f;
+        }
+
+        .modal-detalles {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .modal-info {
+            background: #1a1a2a;
+            border: 3px solid #7f7f7f;
+            padding: 15px;
+        }
+
+        .modal-info .label {
+            color: #7f7f7f;
+            font-size: 0.6rem;
+            margin-bottom: 5px;
+        }
+
+        .modal-info .value {
+            color: #00ff00;
+            font-size: 0.9rem;
+        }
+
+        .modal-botones {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 4px solid;
+        }
+
+        .modal-btn.aceptar {
+            background: #003300;
+            border-color: #00ff00;
+            color: white;
+        }
+
+        .modal-btn.aceptar:hover {
+            background: #004400;
+        }
+
+        .modal-btn.cerrar {
+            background: #1a1a2a;
+            border-color: #7f7f7f;
+            color: white;
+        }
+
+        .modal-btn.cerrar:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        /* Botón volver */
+        .btn-volver {
+            display: block;
+            width: 200px;
+            margin: 40px auto 10px;
+            padding: 15px;
+            background: #1a1a2a;
+            border: 4px solid #7f7f7f;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 8px 8px 0 #0a0a1a;
+            transition: all 0.05s step-end;
+        }
+
+        .btn-volver:hover {
+            border-color: #ffff00;
+            color: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0 #0a0a1a;
+        }
+
+        .btn-volver:active {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0 #0a0a1a;
+        }
+
+        @media (max-width: 800px) {
+            .trabajos-grid { grid-template-columns: 1fr; }
+            .activos-grid { grid-template-columns: 1fr; }
+            .modal-detalles { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="fondo-estrellas" id="fondo"></div>
+    <div id="particulas"></div>
+
+    <div class="contenedor">
+        <h1>TRABAJOS Y MISIONES</h1>
+        <div class="linea"></div>
+
+        <!-- Info superior -->
+        <div class="info-superior">
+            <div class="personaje-info">
+                <div>
+                    <span class="label">PERSONAJE</span>
+                    <span class="valor" id="nombre-personaje">KAELEN FENRIR</span>
+                </div>
+                <div>
+                    <span class="label">RANGO</span>
+                    <span class="valor" id="rango-personaje">RANGO IV</span>
+                </div>
+                <div>
+                    <span class="label">REINO</span>
+                    <span class="valor" id="reino-personaje">ASTRALITH-VANDERMERE</span>
+                </div>
+            </div>
+            <div class="cristales">
+                <span class="label">CRISTALES:</span>
+                <span class="valor" id="cristales">2,450 💎</span>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filtros">
+            <div class="filtro activo" onclick="filtrarTrabajos('todos')">TODOS</div>
+            <div class="filtro" onclick="filtrarTrabajos('combate')">COMBATE</div>
+            <div class="filtro" onclick="filtrarTrabajos('recoleccion')">RECOLECCIÓN</div>
+            <div class="filtro" onclick="filtrarTrabajos('entrega')">ENTREGA</div>
+            <div class="filtro" onclick="filtrarTrabajos('investigacion')">INVESTIGACIÓN</div>
+        </div>
+
+        <!-- Grid de trabajos disponibles -->
+        <div class="trabajos-grid" id="trabajos-grid"></div>
+
+        <!-- Sección de trabajos activos -->
+        <div class="activos-section">
+            <div class="activos-header">TRABAJOS ACTIVOS</div>
+            <div class="activos-grid" id="activos-grid"></div>
+        </div>
+
+        <!-- Modal de detalle -->
+        <div class="modal-overlay" id="modal">
+            <div class="modal-content">
+                <h2 id="modal-titulo">Cazar lobos sombríos</h2>
+                <div class="modal-descripcion" id="modal-descripcion">
+                    Derrota 5 lobos en el Bosque de Thanatror.
+                </div>
+                <div class="modal-detalles" id="modal-detalles">
+                    <div class="modal-info">
+                        <div class="label">TIPO</div>
+                        <div class="value" id="modal-tipo">Combate</div>
+                    </div>
+                    <div class="modal-info">
+                        <div class="label">REINO</div>
+                        <div class="value" id="modal-reino">Thanatror</div>
+                    </div>
+                    <div class="modal-info">
+                        <div class="label">DURACIÓN</div>
+                        <div class="value" id="modal-duracion">3 días</div>
+                    </div>
+                    <div class="modal-info">
+                        <div class="label">DIFICULTAD</div>
+                        <div class="value" id="modal-dificultad">★★★☆☆</div>
+                    </div>
+                    <div class="modal-info">
+                        <div class="label">RECOMPENSA</div>
+                        <div class="value" id="modal-dinero">500 💎</div>
+                    </div>
+                    <div class="modal-info">
+                        <div class="label">OBJETO</div>
+                        <div class="value" id="modal-objeto">Colmillo de lobo</div>
+                    </div>
+                </div>
+                <div class="modal-botones">
+                    <button class="modal-btn aceptar" id="modal-aceptar" onclick="aceptarTrabajo()">ACEPTAR TRABAJO</button>
+                    <button class="modal-btn cerrar" onclick="cerrarModal()">CERRAR</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón volver -->
+        <button class="btn-volver" onclick="window.location.href='menu-desbloqueado.html'">
+            VOLVER AL MENÚ
+        </button>
+    </div>
+
+    <script>
+        // Generar estrellas
+        const fondo = document.getElementById('fondo');
+        for (let i = 0; i < 150; i++) {
+            const estrella = document.createElement('div');
+            estrella.className = 'estrella';
+            estrella.style.left = Math.random() * 100 + '%';
+            estrella.style.top = Math.random() * 100 + '%';
+            estrella.style.animationDelay = Math.random() * 3 + 's';
+            fondo.appendChild(estrella);
+        }
+
+        // Generar partículas arcoíris
+        const particulas = document.getElementById('particulas');
+        const colores = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff', '#ff00ff'];
+        
+        for (let i = 0; i < 50; i++) {
+            const p = document.createElement('div');
+            p.className = 'particula-color';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.background = colores[Math.floor(Math.random() * colores.length)];
+            p.style.animationDelay = Math.random() * 5 + 's';
+            p.style.animationDuration = (5 + Math.random() * 10) + 's';
+            particulas.appendChild(p);
+        }
+
+        // Datos del personaje (simulados)
+        const personajeData = {
+            nombre: 'KAELEN FENRIR',
+            rango: 'RANGO IV',
+            reino: 'ASTRALITH-VANDERMERE',
+            cristales: 2450
+        };
+
+        // Actualizar info del personaje
+        document.getElementById('nombre-personaje').textContent = personajeData.nombre;
+        document.getElementById('rango-personaje').textContent = personajeData.rango;
+        document.getElementById('reino-personaje').textContent = personajeData.reino;
+        document.getElementById('cristales').textContent = personajeData.cristales.toLocaleString() + ' 💎';
+
+        // Datos de trabajos (simulados)
+        const trabajosData = [
+            {
+                id: 1,
+                titulo: 'Cazar lobos sombríos',
+                descripcion: 'Derrota 5 lobos en el Bosque de Thanatror. Los lobos sombríos son criaturas nocturnas que acechan en la oscuridad.',
+                tipo: 'combate',
+                reino: 'Thanatror',
+                duracion: '3 días',
+                dificultad: 3,
+                recompensa_dinero: 500,
+                recompensa_objeto: 'Colmillo de lobo',
+                objetivo: 5,
+                progreso: 0,
+                activo: false,
+                completado: false
+            },
+            {
+                id: 2,
+                titulo: 'Recolectar plantas de luna',
+                descripcion: 'Reúne 10 plantas de luna en Astralith-Vandermere. Las plantas de luna solo florecen durante la noche.',
+                tipo: 'recoleccion',
+                reino: 'Astralith-Vandermere',
+                duracion: '1 día',
+                dificultad: 2,
+                recompensa_dinero: 300,
+                recompensa_objeto: 'Pétalo lunar',
+                objetivo: 10,
+                progreso: 0,
+                activo: false,
+                completado: false
+            },
+            {
+                id: 3,
+                titulo: 'Entregar paquete misterioso',
+                descripcion: 'Lleva este paquete a Norum Dominai. El contenido es desconocido, pero el pago es seguro.',
+                tipo: 'entrega',
+                reino: 'Norum Dominai',
+                duracion: '1 día',
+                dificultad: 1,
+                recompensa_dinero: 200,
+                recompensa_objeto: 'Mapa secreto',
+                objetivo: 1,
+                progreso: 0,
+                activo: false,
+                completado: false
+            },
+            {
+                id: 4,
+                titulo: 'Investigar ruidos extraños',
+                descripcion: 'Averigua qué causa los ruidos en las cavernas de Balnath. Los mineros están asustados.',
+                tipo: 'investigacion',
+                reino: 'Balnath',
+                duracion: '2 días',
+                dificultad: 3,
+                recompensa_dinero: 400,
+                recompensa_objeto: 'Gema luminosa',
+                objetivo: 1,
+                progreso: 0,
+                activo: false,
+                completado: false
+            },
+            {
+                id: 5,
+                titulo: 'Pescar en Kaidom',
+                descripcion: 'Atrapa 3 peces mágicos en el Mar de Kaidom. Los peces brillan en la oscuridad.',
+                tipo: 'recoleccion',
+                reino: 'Kaidom',
+                duracion: '1 día',
+                dificultad: 2,
+                recompensa_dinero: 350,
+                recompensa_objeto: 'Escama de sirena',
+                objetivo: 3,
+                progreso: 0,
+                activo: false,
+                completado: false
+            }
+        ];
+
+        let trabajos = [...trabajosData];
+        let trabajoSeleccionado = null;
+        let filtroActual = 'todos';
+
+        // Renderizar trabajos
+        function renderizarTrabajos() {
+            const grid = document.getElementById('trabajos-grid');
+            grid.innerHTML = '';
+
+            const trabajosFiltrados = filtroActual === 'todos' 
+                ? trabajos.filter(t => !t.activo && !t.completado)
+                : trabajos.filter(t => t.tipo === filtroActual && !t.activo && !t.completado);
+
+            trabajosFiltrados.forEach(trabajo => {
+                const card = document.createElement('div');
+                card.className = 'trabajo-card';
+                
+                // Generar estrellas de dificultad
+                let estrellas = '';
+                for (let i = 1; i <= 5; i++) {
+                    estrellas += `<span class="estrella ${i <= trabajo.dificultad ? 'activa' : ''}">★</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="trabajo-header">
+                        <span class="trabajo-titulo">${trabajo.titulo}</span>
+                        <div class="trabajo-dificultad">${estrellas}</div>
+                    </div>
+                    <div class="trabajo-info">
+                        <div class="info-item">
+                            <div class="label">TIPO</div>
+                            <div class="value">${trabajo.tipo.toUpperCase()}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">REINO</div>
+                            <div class="value">${trabajo.reino}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">DURACIÓN</div>
+                            <div class="value">${trabajo.duracion}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">OBJETIVO</div>
+                            <div class="value">${trabajo.objetivo}</div>
+                        </div>
+                    </div>
+                    <div class="trabajo-recompensa">
+                        <span class="recompensa-dinero">${trabajo.recompensa_dinero} 💎</span>
+                        <span class="recompensa-objeto">+ ${trabajo.recompensa_objeto}</span>
+                    </div>
+                `;
+
+                card.onclick = () => mostrarDetalle(trabajo);
+                grid.appendChild(card);
+            });
+        }
+
+        // Renderizar trabajos activos
+        function renderizarActivos() {
+            const grid = document.getElementById('activos-grid');
+            grid.innerHTML = '';
+
+            const activos = trabajos.filter(t => t.activo && !t.completado);
+
+            activos.forEach(trabajo => {
+                const card = document.createElement('div');
+                card.className = 'activo-card';
+                
+                const porcentaje = (trabajo.progreso / trabajo.objetivo) * 100;
+
+                card.innerHTML = `
+                    <div class="activo-titulo">${trabajo.titulo}</div>
+                    <div class="activo-progreso">
+                        <div class="progreso-barra" style="width: ${porcentaje}%;"></div>
+                    </div>
+                    <div class="activo-info">
+                        <span>${trabajo.progreso}/${trabajo.objetivo}</span>
+                        <span>${trabajo.recompensa_dinero} 💎</span>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            if (activos.length === 0) {
+                grid.innerHTML = '<div style="color: #7f7f7f; text-align: center; padding: 20px;">NO TIENES TRABAJOS ACTIVOS</div>';
+            }
+        }
+
+        // Mostrar detalle del trabajo
+        function mostrarDetalle(trabajo) {
+            trabajoSeleccionado = trabajo;
+            
+            document.getElementById('modal-titulo').textContent = trabajo.titulo;
+            document.getElementById('modal-descripcion').textContent = trabajo.descripcion;
+            document.getElementById('modal-tipo').textContent = trabajo.tipo.toUpperCase();
+            document.getElementById('modal-reino').textContent = trabajo.reino;
+            document.getElementById('modal-duracion').textContent = trabajo.duracion;
+            
+            // Estrellas de dificultad
+            let estrellas = '';
+            for (let i = 1; i <= 5; i++) {
+                estrellas += i <= trabajo.dificultad ? '★' : '☆';
+            }
+            document.getElementById('modal-dificultad').textContent = estrellas;
+            
+            document.getElementById('modal-dinero').textContent = trabajo.recompensa_dinero + ' 💎';
+            document.getElementById('modal-objeto').textContent = trabajo.recompensa_objeto;
+            
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        // Cerrar modal
+        function cerrarModal() {
+            document.getElementById('modal').style.display = 'none';
+            trabajoSeleccionado = null;
+        }
+
+        // Aceptar trabajo
+        function aceptarTrabajo() {
+            if (!trabajoSeleccionado) return;
+
+            const trabajo = trabajos.find(t => t.id === trabajoSeleccionado.id);
+            if (trabajo) {
+                trabajo.activo = true;
+                trabajo.progreso = 0;
+            }
+
+            renderizarTrabajos();
+            renderizarActivos();
+            cerrarModal();
+            
+            mostrarMensaje('✓ TRABAJO ACEPTADO ✓', 'exito');
+        }
+
+        // Filtrar trabajos
+        function filtrarTrabajos(tipo) {
+            filtroActual = tipo;
+            
+            document.querySelectorAll('.filtro').forEach(f => f.classList.remove('activo'));
+            event.target.classList.add('activo');
+            
+            renderizarTrabajos();
+        }
+
+        // Mostrar mensaje
+        function mostrarMensaje(texto, tipo) {
+            const mensaje = document.createElement('div');
+            mensaje.className = 'mensaje ' + tipo;
+            mensaje.textContent = texto;
+            document.body.appendChild(mensaje);
+            setTimeout(() => mensaje.remove(), 3000);
+        }
+
+        // Inicializar
+        renderizarTrabajos();
+        renderizarActivos();
+
+        // Estilo para mensajes
+        const style = document.createElement('style');
+        style.textContent = `
+            .mensaje {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                padding: 30px;
+                background: #000000;
+                border-width: 6px;
+                border-style: solid;
+                z-index: 1000;
+                text-align: center;
+                line-height: 2;
+                animation: aparecerMensaje 0.2s steps(5);
+            }
+            .mensaje.error {
+                border-color: #ff0000;
+                background: #330000;
+                color: white;
+            }
+            .mensaje.exito {
+                border-color: #00ff00;
+                background: #003300;
+                color: white;
+            }
+            @keyframes aparecerMensaje {
+                from { transform: translate(-50%, -50%) scale(0); }
+                to { transform: translate(-50%, -50%) scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
