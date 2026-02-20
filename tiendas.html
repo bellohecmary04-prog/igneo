@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÍGNEO - TIENDAS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -291,27 +292,27 @@
             <div class="personaje-info">
                 <div class="info-item">
                     <div class="label">PERSONAJE</div>
-                    <div class="valor" id="nombre-personaje">KAELEN</div>
+                    <div class="valor" id="nombre-personaje">---</div>
                 </div>
                 <div class="info-item">
                     <div class="label">REINO</div>
-                    <div class="valor" id="reino-personaje">KAIDOM</div>
+                    <div class="valor" id="reino-personaje">---</div>
                 </div>
                 <div class="info-item">
                     <div class="label">RANGO</div>
-                    <div class="valor" id="rango-personaje">RANGO IV</div>
+                    <div class="valor" id="rango-personaje">---</div>
                 </div>
             </div>
             <div class="cristales">
                 <span class="label">CRISTALES:</span>
-                <span class="valor" id="cristales">2450</span>
+                <span class="valor" id="cristales">0</span>
             </div>
         </div>
 
         <!-- INFO DEL REINO ACTUAL -->
         <div class="reino-info" id="reino-info">
-            <div class="reino-nombre" id="reino-nombre">REINO DE KAIDOM</div>
-            <div class="reino-desc" id="reino-desc">Reino Acuático, donde las olas susurran secretos antiguos.</div>
+            <div class="reino-nombre" id="reino-nombre">---</div>
+            <div class="reino-desc" id="reino-desc">---</div>
         </div>
 
         <!-- GRID DE TIENDAS -->
@@ -324,6 +325,11 @@
     </div>
 
     <script>
+        // ===== CONEXIÓN A SUPABASE =====
+        const SUPABASE_URL = 'https://iwqeikrjhyqxyduvhhkg.supabase.co';
+        const SUPABASE_KEY = 'unsrhffwguwfebhppptz';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         // GENERAR ESTRELLAS
         for (let i = 0; i < 150; i++) {
             const estrella = document.createElement('div');
@@ -333,15 +339,6 @@
             estrella.style.animationDelay = Math.random() * 3 + 's';
             document.getElementById('estrellas').appendChild(estrella);
         }
-
-        // ===== DATOS DEL PERSONAJE =====
-        const personaje = {
-            nombre: 'KAELEN',
-            reino: 'KAIDOM',
-            reinoId: 'kaidom',
-            rango: 'RANGO IV',
-            cristales: 2450
-        };
 
         // ===== DATOS DE LOS REINOS =====
         const reinos = {
@@ -378,70 +375,140 @@
             }
         }
 
-        // ===== DATOS DE LAS 5 TIENDAS =====
-        const tiendas = [
-            {
-                id: 1,
-                nombre: 'EL CÁLIZ ETERNO',
-                tipo: 'CONSUMIBLES',
-                icono: 'pocion',
-                descripcion: 'Pociones, elixires, carnes místicas y frutas del Nemeton.',
-                eslogan: '"Lo que el cuerpo necesita, el alma lo consume."',
-                ambiente: 'Un aroma a hierbas frescas y frascos de cristal que brillan con luz propia.',
-                disponibleEn: ['astralith', 'kaidom', 'balnath']
-            },
-            {
-                id: 2,
-                nombre: 'RELIQUIAS DEL ALBA',
-                tipo: 'SAGRADOS',
-                icono: 'corona',
-                descripcion: 'Objetos únicos, huevos de fénix, ojos de la verdad y contratos de almas.',
-                eslogan: '"Para aquellos que buscan lo que no debe ser encontrado."',
-                ambiente: 'Un silencio sepulcral, con pedestales de terciopelo y guardias de piedra.',
-                disponibleEn: ['astralith', 'norum']
-            },
-            {
-                id: 3,
-                nombre: 'EL YUNQUE CENIZO',
-                tipo: 'EQUIPO',
-                icono: 'espada',
-                descripcion: 'Armas, armaduras y todo lo que un guerrero necesita para la batalla.',
-                eslogan: '"Tu piel será acero; tu mano, la muerte."',
-                ambiente: 'Calor intenso, chispas saltando y el sonido constante del martillo.',
-                disponibleEn: ['norum', 'thanatror', 'balnath']
-            },
-            {
-                id: 4,
-                nombre: 'ESENCIA PURA',
-                tipo: 'MATERIALES',
-                icono: 'material',
-                descripcion: 'Lingotes, polvo de diamante, aceites mágicos y cuero de quimera.',
-                eslogan: '"La base de toda grandeza nace de la tierra."',
-                ambiente: 'Estanterías llenas de materias primas brutas y rocas brillantes.',
-                disponibleEn: ['balnath', 'thanatror']
-            },
-            {
-                id: 5,
-                nombre: 'EL BAZAR UMBRÍO',
-                tipo: 'MISCELÁNEOS',
-                icono: 'misc',
-                descripcion: 'Brújulas, llaves de cristal y objetos extraños pero vitales.',
-                eslogan: '"Lo que no sabías que necesitabas está justo aquí."',
-                ambiente: 'Una tienda desordenada llena de curiosidades mecánicas.',
-                disponibleEn: ['kaidom', 'norum', 'thanatror']
+        // ===== VARIABLES GLOBALES =====
+        let personaje = {
+            nombre: '---',
+            reino: '---',
+            reinoId: 'kaidom',
+            rango: '---',
+            cristales: 0
+        };
+
+        let tiendas = [];
+
+        // ===== CARGAR DATOS DEL PERSONAJE DESDE SUPABASE =====
+        async function cargarPersonaje() {
+            // Obtener personaje activo de localStorage
+            const personajeActivo = localStorage.getItem('personajeActivo');
+            
+            if (!personajeActivo) {
+                window.location.href = 'login.html';
+                return;
             }
-        ];
 
-        // ===== ACTUALIZAR INFO DEL PERSONAJE =====
-        document.getElementById('nombre-personaje').textContent = personaje.nombre;
-        document.getElementById('reino-personaje').textContent = personaje.reino;
-        document.getElementById('rango-personaje').textContent = personaje.rango;
-        document.getElementById('cristales').textContent = personaje.cristales;
+            const { nombre } = JSON.parse(personajeActivo);
 
-        // ===== ACTUALIZAR INFO DEL REINO =====
-        const reinoActual = reinos[personaje.reinoId];
-        document.getElementById('reino-nombre').textContent = reinoActual.nombre;
-        document.getElementById('reino-desc').textContent = reinoActual.desc;
+            try {
+                const { data, error } = await supabase
+                    .from('personajes')
+                    .select('nombre, raza, rango, dinero')
+                    .eq('nombre', nombre)
+                    .single();
+
+                if (error || !data) {
+                    console.error('Error cargando personaje:', error);
+                    return;
+                }
+
+                // Determinar el reino según la raza (esto es un ejemplo, ajústalo según tus datos)
+                let reinoId = 'kaidom'; // Por defecto
+                if (data.raza.includes('FÉNIX') || data.raza.includes('HADAS')) {
+                    reinoId = 'astralith';
+                } else if (data.raza.includes('DEMONIO')) {
+                    reinoId = 'norum';
+                } // etc...
+
+                personaje = {
+                    nombre: data.nombre,
+                    reino: reinos[reinoId].nombre,
+                    reinoId: reinoId,
+                    rango: data.rango,
+                    cristales: data.dinero || 0
+                };
+
+                // Actualizar la interfaz
+                document.getElementById('nombre-personaje').textContent = personaje.nombre;
+                document.getElementById('reino-personaje').textContent = personaje.reino;
+                document.getElementById('rango-personaje').textContent = personaje.rango;
+                document.getElementById('cristales').textContent = personaje.cristales;
+
+                // Actualizar info del reino
+                const reinoActual = reinos[personaje.reinoId];
+                document.getElementById('reino-nombre').textContent = reinoActual.nombre;
+                document.getElementById('reino-desc').textContent = reinoActual.desc;
+
+                // Cargar tiendas
+                await cargarTiendas();
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== CARGAR TIENDAS DESDE SUPABASE =====
+        async function cargarTiendas() {
+            try {
+                // Aquí cargarías las tiendas desde Supabase si tienes una tabla de tiendas
+                // Por ahora usamos los datos quemados
+                tiendas = [
+                    {
+                        id: 1,
+                        nombre: 'EL CÁLIZ ETERNO',
+                        tipo: 'CONSUMIBLES',
+                        icono: 'pocion',
+                        descripcion: 'Pociones, elixires, carnes místicas y frutas del Nemeton.',
+                        eslogan: '"Lo que el cuerpo necesita, el alma lo consume."',
+                        ambiente: 'Un aroma a hierbas frescas y frascos de cristal que brillan con luz propia.',
+                        disponibleEn: ['astralith', 'kaidom', 'balnath']
+                    },
+                    {
+                        id: 2,
+                        nombre: 'RELIQUIAS DEL ALBA',
+                        tipo: 'SAGRADOS',
+                        icono: 'corona',
+                        descripcion: 'Objetos únicos, huevos de fénix, ojos de la verdad y contratos de almas.',
+                        eslogan: '"Para aquellos que buscan lo que no debe ser encontrado."',
+                        ambiente: 'Un silencio sepulcral, con pedestales de terciopelo y guardias de piedra.',
+                        disponibleEn: ['astralith', 'norum']
+                    },
+                    {
+                        id: 3,
+                        nombre: 'EL YUNQUE CENIZO',
+                        tipo: 'EQUIPO',
+                        icono: 'espada',
+                        descripcion: 'Armas, armaduras y todo lo que un guerrero necesita para la batalla.',
+                        eslogan: '"Tu piel será acero; tu mano, la muerte."',
+                        ambiente: 'Calor intenso, chispas saltando y el sonido constante del martillo.',
+                        disponibleEn: ['norum', 'thanatror', 'balnath']
+                    },
+                    {
+                        id: 4,
+                        nombre: 'ESENCIA PURA',
+                        tipo: 'MATERIALES',
+                        icono: 'material',
+                        descripcion: 'Lingotes, polvo de diamante, aceites mágicos y cuero de quimera.',
+                        eslogan: '"La base de toda grandeza nace de la tierra."',
+                        ambiente: 'Estanterías llenas de materias primas brutas y rocas brillantes.',
+                        disponibleEn: ['balnath', 'thanatror']
+                    },
+                    {
+                        id: 5,
+                        nombre: 'EL BAZAR UMBRÍO',
+                        tipo: 'MISCELÁNEOS',
+                        icono: 'misc',
+                        descripcion: 'Brújulas, llaves de cristal y objetos extraños pero vitales.',
+                        eslogan: '"Lo que no sabías que necesitabas está justo aquí."',
+                        ambiente: 'Una tienda desordenada llena de curiosidades mecánicas.',
+                        disponibleEn: ['kaidom', 'norum', 'thanatror']
+                    }
+                ];
+
+                renderizarTiendas();
+
+            } catch (error) {
+                console.error('Error cargando tiendas:', error);
+            }
+        }
 
         // ===== RENDERIZAR TIENDAS =====
         function renderizarTiendas() {
@@ -474,8 +541,8 @@
             });
         }
 
-        // INICIALIZAR
-        renderizarTiendas();
+        // ===== INICIALIZAR =====
+        cargarPersonaje();
     </script>
 </body>
 </html>
