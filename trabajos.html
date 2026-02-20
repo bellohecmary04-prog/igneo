@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÍGNEO - TRABAJOS Y MISIONES</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -534,20 +535,20 @@
             <div class="personaje-info">
                 <div class="info-item">
                     <div class="label">PERSONAJE</div>
-                    <div class="valor" id="nombre-personaje">KAELEN</div>
+                    <div class="valor" id="nombre-personaje">---</div>
                 </div>
                 <div class="info-item">
                     <div class="label">RANGO</div>
-                    <div class="valor" id="rango-personaje">RANGO IV</div>
+                    <div class="valor" id="rango-personaje">---</div>
                 </div>
                 <div class="info-item">
                     <div class="label">REINO</div>
-                    <div class="valor" id="reino-personaje">KAIDOM</div>
+                    <div class="valor" id="reino-personaje">---</div>
                 </div>
             </div>
             <div class="cristales">
                 <span class="label">CRISTALES:</span>
-                <span class="valor" id="cristales">2450</span>
+                <span class="valor" id="cristales">0</span>
             </div>
         </div>
 
@@ -611,6 +612,11 @@
     </div>
 
     <script>
+        // ===== CONEXIÓN A SUPABASE =====
+        const SUPABASE_URL = 'https://iwqeikrjhyqxyduvhhkg.supabase.co';
+        const SUPABASE_KEY = 'unsrhffwguwfebhppptz';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         // GENERAR ESTRELLAS
         for (let i = 0; i < 150; i++) {
             const estrella = document.createElement('div');
@@ -621,125 +627,144 @@
             document.getElementById('estrellas').appendChild(estrella);
         }
 
-        // ===== DATOS DEL PERSONAJE =====
-        const personaje = {
-            nombre: 'KAELEN',
-            rango: 'RANGO IV',
-            reino: 'KAIDOM',
-            cristales: 2450
+        // ===== VARIABLES GLOBALES =====
+        let personaje = {
+            id: null,
+            nombre: '---',
+            rango: '---',
+            reino: '---',
+            cristales: 0
         };
 
-        // ===== DATOS DE TRABAJOS =====
-        let trabajos = [
-            {
-                id: 1,
-                titulo: 'CAZAR LOBOS SOMBRÍOS',
-                descripcion: 'Derrota 5 lobos en el Bosque de Thanatror. Los lobos sombríos son criaturas nocturnas que acechan en la oscuridad. Ten cuidado con sus aullidos, atraen a más.',
-                tipo: 'combate',
-                reino: 'THANATROR',
-                rangoRequerido: 'RANGO IV',
-                duracion: '3 DÍAS',
-                dificultad: 3,
-                recompensaDinero: 500,
-                recompensaObjeto: 'COLMÍLLO DE LOBO',
-                objetivos: { total: 5, actual: 0 },
-                estado: 'disponible'
-            },
-            {
-                id: 2,
-                titulo: 'RECOLECTAR PLANTAS DE LUNA',
-                descripcion: 'Reúne 10 plantas de luna en Astralith-Vandermere. Las plantas de luna solo florecen durante la noche y brillan con luz propia.',
-                tipo: 'recoleccion',
-                reino: 'ASTRALITH-VANDERMERE',
-                rangoRequerido: 'RANGO III',
-                duracion: '1 DÍA',
-                dificultad: 2,
-                recompensaDinero: 300,
-                recompensaObjeto: 'PÉTALO LUNAR',
-                objetivos: { total: 10, actual: 0 },
-                estado: 'disponible'
-            },
-            {
-                id: 3,
-                titulo: 'ENTREGAR PAQUETE MISTERIOSO',
-                descripcion: 'Lleva este paquete a Norum Dominai. El contenido es desconocido, pero el pago es seguro. El destinatario te espera en la taberna "El Fuego Eterno".',
-                tipo: 'entrega',
-                reino: 'NORUM DOMINAI',
-                rangoRequerido: 'RANGO II',
-                duracion: '1 DÍA',
-                dificultad: 1,
-                recompensaDinero: 200,
-                recompensaObjeto: 'MAPA SECRETO',
-                objetivos: { total: 1, actual: 0 },
-                estado: 'disponible'
-            },
-            {
-                id: 4,
-                titulo: 'INVESTIGAR RUIDOS EXTRAÑOS',
-                descripcion: 'Averigua qué causa los ruidos en las cavernas de Balnath. Los mineros están asustados y se niegan a trabajar. Podría ser algo peligroso.',
-                tipo: 'investigacion',
-                reino: 'BALNATH',
-                rangoRequerido: 'RANGO IV',
-                duracion: '2 DÍAS',
-                dificultad: 3,
-                recompensaDinero: 400,
-                recompensaObjeto: 'GEMA LUMINOSA',
-                objetivos: { total: 3, actual: 0 },
-                estado: 'disponible'
-            },
-            {
-                id: 5,
-                titulo: 'PESCAR EN KAIDOM',
-                descripcion: 'Atrapa 3 peces mágicos en el Mar de Kaidom. Los peces brillan en la oscuridad y son muy escurridizos. Se dice que solo aparecen en luna llena.',
-                tipo: 'recoleccion',
-                reino: 'KAIDOM',
-                rangoRequerido: 'RANGO III',
-                duracion: '1 DÍA',
-                dificultad: 2,
-                recompensaDinero: 350,
-                recompensaObjeto: 'ESCAMA DE SIRENA',
-                objetivos: { total: 3, actual: 0 },
-                estado: 'disponible'
-            },
-            {
-                id: 6,
-                titulo: 'EXTERMINAR PLAGA',
-                descripcion: 'Hay una plaga de insectos gigantes en las cuevas de Balnath. Los mineros no pueden trabajar. Acaba con ellos.',
-                tipo: 'combate',
-                reino: 'BALNATH',
-                rangoRequerido: 'RANGO IV',
-                duracion: '2 DÍAS',
-                dificultad: 3,
-                recompensaDinero: 450,
-                recompensaObjeto: 'VENENO DE INSECTO',
-                objetivos: { total: 8, actual: 0 },
-                estado: 'activo',
-                progreso: 3
-            },
-            {
-                id: 7,
-                titulo: 'AYUDAR AL ERMITAÑO',
-                descripcion: 'Un ermitaño necesita ayuda para recolectar hierbas medicinales en el bosque.',
-                tipo: 'recoleccion',
-                reino: 'THANATROR',
-                rangoRequerido: 'RANGO II',
-                duracion: '1 DÍA',
-                dificultad: 1,
-                recompensaDinero: 150,
-                recompensaObjeto: 'HIERBAS CURATIVAS',
-                objetivos: { total: 5, actual: 5 },
-                estado: 'completado'
-            }
-        ];
-
+        let trabajos = [];
         let filtroActual = 'todos';
         let trabajoSeleccionado = null;
 
-        // ===== ACTUALIZAR INFO DEL PERSONAJE =====
-        document.getElementById('nombre-personaje').textContent = personaje.nombre;
-        document.getElementById('rango-personaje').textContent = personaje.rango;
-        document.getElementById('reino-personaje').textContent = personaje.reino;
-        document.getElementById('cristales').textContent = personaje.cristales;
+        // ===== CARGAR DATOS DEL PERSONAJE =====
+        async function cargarPersonaje() {
+            const personajeActivo = localStorage.getItem('personajeActivo');
+            
+            if (!personajeActivo) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const { id, nombre } = JSON.parse(personajeActivo);
+            personaje.id = id;
+
+            try {
+                const { data, error } = await supabase
+                    .from('personajes')
+                    .select('nombre, rango, dinero')
+                    .eq('id', id)
+                    .single();
+
+                if (error || !data) {
+                    console.error('Error cargando personaje:', error);
+                    return;
+                }
+
+                personaje.nombre = data.nombre;
+                personaje.rango = data.rango;
+                personaje.cristales = data.dinero || 0;
+
+                // Actualizar interfaz
+                document.getElementById('nombre-personaje').textContent = personaje.nombre;
+                document.getElementById('rango-personaje').textContent = personaje.rango;
+                document.getElementById('cristales').textContent = personaje.cristales;
+
+                // Cargar trabajos
+                await cargarTrabajos();
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== CARGAR TRABAJOS DESDE SUPABASE =====
+        async function cargarTrabajos() {
+            try {
+                // Aquí cargarías los trabajos desde Supabase si tienes una tabla
+                // Por ahora usamos los datos quemados
+                trabajos = [
+                    {
+                        id: 1,
+                        titulo: 'CAZAR LOBOS SOMBRÍOS',
+                        descripcion: 'Derrota 5 lobos en el Bosque de Thanatror. Los lobos sombríos son criaturas nocturnas que acechan en la oscuridad.',
+                        tipo: 'combate',
+                        reino: 'THANATROR',
+                        rangoRequerido: 'RANGO IV',
+                        duracion: '3 DÍAS',
+                        dificultad: 3,
+                        recompensaDinero: 500,
+                        recompensaObjeto: 'COLMÍLLO DE LOBO',
+                        objetivos: { total: 5, actual: 0 },
+                        estado: 'disponible'
+                    },
+                    {
+                        id: 2,
+                        titulo: 'RECOLECTAR PLANTAS DE LUNA',
+                        descripcion: 'Reúne 10 plantas de luna en Astralith-Vandermere.',
+                        tipo: 'recoleccion',
+                        reino: 'ASTRALITH-VANDERMERE',
+                        rangoRequerido: 'RANGO III',
+                        duracion: '1 DÍA',
+                        dificultad: 2,
+                        recompensaDinero: 300,
+                        recompensaObjeto: 'PÉTALO LUNAR',
+                        objetivos: { total: 10, actual: 0 },
+                        estado: 'disponible'
+                    },
+                    {
+                        id: 3,
+                        titulo: 'ENTREGAR PAQUETE MISTERIOSO',
+                        descripcion: 'Lleva este paquete a Norum Dominai.',
+                        tipo: 'entrega',
+                        reino: 'NORUM DOMINAI',
+                        rangoRequerido: 'RANGO II',
+                        duracion: '1 DÍA',
+                        dificultad: 1,
+                        recompensaDinero: 200,
+                        recompensaObjeto: 'MAPA SECRETO',
+                        objetivos: { total: 1, actual: 0 },
+                        estado: 'disponible'
+                    },
+                    {
+                        id: 4,
+                        titulo: 'INVESTIGAR RUIDOS EXTRAÑOS',
+                        descripcion: 'Averigua qué causa los ruidos en las cavernas de Balnath.',
+                        tipo: 'investigacion',
+                        reino: 'BALNATH',
+                        rangoRequerido: 'RANGO IV',
+                        duracion: '2 DÍAS',
+                        dificultad: 3,
+                        recompensaDinero: 400,
+                        recompensaObjeto: 'GEMA LUMINOSA',
+                        objetivos: { total: 3, actual: 0 },
+                        estado: 'disponible'
+                    },
+                    {
+                        id: 5,
+                        titulo: 'PESCAR EN KAIDOM',
+                        descripcion: 'Atrapa 3 peces mágicos en el Mar de Kaidom.',
+                        tipo: 'recoleccion',
+                        reino: 'KAIDOM',
+                        rangoRequerido: 'RANGO III',
+                        duracion: '1 DÍA',
+                        dificultad: 2,
+                        recompensaDinero: 350,
+                        recompensaObjeto: 'ESCAMA DE SIRENA',
+                        objetivos: { total: 3, actual: 0 },
+                        estado: 'disponible'
+                    }
+                ];
+
+                renderizarTrabajos();
+
+            } catch (error) {
+                console.error('Error cargando trabajos:', error);
+            }
+        }
 
         // ===== RENDERIZAR TRABAJOS =====
         function renderizarTrabajos() {
@@ -883,7 +908,7 @@
         }
 
         // ===== ACEPTAR TRABAJO =====
-        function aceptarTrabajo(id) {
+        async function aceptarTrabajo(id) {
             const trabajo = trabajos.find(t => t.id === id);
             const activos = trabajos.filter(t => t.estado === 'activo').length;
             
@@ -896,12 +921,15 @@
             trabajo.estado = 'activo';
             trabajo.progreso = 0;
             
+            // Aquí guardarías en Supabase el trabajo aceptado
+            // (si tuvieras una tabla de trabajos_activos)
+            
             renderizarTrabajos();
             cerrarModal();
         }
 
         // ===== ENTREGAR TRABAJO =====
-        function entregarTrabajo(id) {
+        async function entregarTrabajo(id) {
             const trabajo = trabajos.find(t => t.id === id);
             
             if (trabajo.progreso < trabajo.objetivos.total) {
@@ -909,10 +937,21 @@
                 return;
             }
             
-            trabajo.estado = 'completado';
+            // Actualizar cristales
             personaje.cristales += trabajo.recompensaDinero;
             document.getElementById('cristales').textContent = personaje.cristales;
             
+            // Actualizar en Supabase
+            const { error } = await supabase
+                .from('personajes')
+                .update({ dinero: personaje.cristales })
+                .eq('id', personaje.id);
+            
+            if (error) {
+                console.error('Error actualizando cristales:', error);
+            }
+            
+            trabajo.estado = 'completado';
             renderizarTrabajos();
         }
 
@@ -925,7 +964,7 @@
         }
 
         // ===== INICIALIZAR =====
-        renderizarTrabajos();
+        cargarPersonaje();
     </script>
 </body>
 </html>
