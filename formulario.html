@@ -817,3 +817,85 @@
     </script>
 </body>
 </html>
+
+// Función para guardar el personaje (PON ESTO EN formulario.html)
+function guardarPersonaje() {
+    // Crear objeto con todos los datos del personaje
+    const personajeData = {
+        // Datos básicos
+        nombre: document.getElementById('nombre').value,
+        email: document.getElementById('email').value,
+        raza: document.getElementById('raza').value,
+        rango: document.getElementById('rango').value,
+        edad: document.getElementById('edad').value,
+        genero: document.getElementById('genero').value,
+        altura: document.getElementById('altura').value,
+        imagen: imagenData || null,
+        
+        // Habilidades (valores de las barras)
+        habilidades: {
+            'PERSUASIÓN': obtenerValorBarra('habilidades', 0),
+            'COMUNICACIÓN': obtenerValorBarra('habilidades', 1),
+            'PERCEPCIÓN': obtenerValorBarra('habilidades', 2),
+            'MEDITACIÓN': obtenerValorBarra('habilidades', 3),
+            'ALFABETISMO': obtenerValorBarra('habilidades', 4),
+            'CREATIVIDAD': obtenerValorBarra('habilidades', 5),
+            'TECNOLOGÍA': obtenerValorBarra('habilidades', 6),
+            'COMBATE': obtenerValorBarra('habilidades', 7),
+            'SUPERVIVENCIA': obtenerValorBarra('habilidades', 8),
+            'COQUETA': obtenerValorBarra('habilidades', 9),
+            'SEDUCCIÓN': obtenerValorBarra('habilidades', 10),
+            'SUERTE': obtenerValorBarra('habilidades', 11)
+        },
+        
+        // Atributos
+        cuerpo: {
+            'DESTREZA': obtenerValorBarra('cuerpo', 0),
+            'SALUD': obtenerValorBarra('cuerpo', 1),
+            'ENERGÍA': obtenerValorBarra('cuerpo', 2),
+            'BELLEZA': obtenerValorBarra('cuerpo', 3),
+            'ESTILO': obtenerValorBarra('cuerpo', 4)
+        },
+        
+        mente: {
+            'INTELIGENCIA': obtenerValorBarra('mente', 0),
+            'FELICIDAD': obtenerValorBarra('mente', 1),
+            'ESPIRITUALIDAD': obtenerValorBarra('mente', 2),
+            'CONFIANZA': obtenerValorBarra('mente', 3)
+        },
+        
+        social: {
+            'CARISMA': obtenerValorBarra('social', 0),
+            'EMPATÍA': obtenerValorBarra('social', 1),
+            'AGRESIVIDAD': obtenerValorBarra('social', 2),
+            'GENEROSIDAD': obtenerValorBarra('social', 3),
+            'RIQUEZA': obtenerValorBarra('social', 4),
+            'LIBIDO': obtenerValorBarra('social', 5)
+        },
+        
+        // Opciones exclusivas
+        opciones: {
+            opcion1: document.getElementById('opcion1').value,
+            opcion2: document.getElementById('opcion2').value,
+            opcion3: document.getElementById('opcion3').value,
+            opcion4: document.getElementById('opcion4').value
+        },
+        
+        // Inventario vacío (se llenará después)
+        inventario: []
+    };
+    
+    // Guardar en localStorage
+    localStorage.setItem('personajeData', JSON.stringify(personajeData));
+    
+    // Mostrar mensaje y redirigir
+    alert('* Solicitud enviada. Los guardianes la revisarán.');
+    window.location.href = 'menu.html';
+}
+
+// Función auxiliar para obtener valores de las barras
+function obtenerValorBarra(seccion, index) {
+    // Aquí debes obtener el valor de la barra según cómo las implementaste
+    // Por ahora retorna valores de ejemplo
+    return 3; // Temporal - cámbialo después
+}
