@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÍGNEO - MAPA DEL MUNDO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -447,20 +448,20 @@
             <div class="personaje-info">
                 <div class="info-item">
                     <div class="label">PERSONAJE</div>
-                    <div class="valor" id="nombre-personaje">KAELEN</div>
+                    <div class="valor" id="nombre-personaje">---</div>
                 </div>
                 <div class="info-item">
                     <div class="label">RAZA</div>
-                    <div class="valor" id="raza-personaje">EL FÉNIX</div>
+                    <div class="valor" id="raza-personaje">---</div>
                 </div>
                 <div class="info-item">
                     <div class="label">RANGO</div>
-                    <div class="valor" id="rango-personaje">RANGO IV</div>
+                    <div class="valor" id="rango-personaje">---</div>
                 </div>
             </div>
             <div class="reino-actual">
                 <div class="label">REINO ACTUAL</div>
-                <div class="valor" id="reino-actual">ASTRALITH-VANDERMERE</div>
+                <div class="valor" id="reino-actual">---</div>
             </div>
         </div>
 
@@ -513,14 +514,11 @@
         <!-- PANEL DE INFORMACIÓN DE REGIÓN -->
         <div class="info-region" id="info-region">
             <div class="info-header">
-                <h2 id="info-titulo">ASTRALITH-VANDERMERE</h2>
+                <h2 id="info-titulo">---</h2>
                 <button class="btn-cerrar" onclick="cerrarInfo()">✕</button>
             </div>
             <div class="info-contenido">
-                <div class="info-descripcion" id="info-descripcion">
-                    Reino Celestial, donde las nubes guardan los sueños de los antiguos.
-                    Sus habitantes son criaturas de luz y sabiduría.
-                </div>
+                <div class="info-descripcion" id="info-descripcion">---</div>
                 <div class="puntos-interes" id="puntos-interes">
                     <h3>PUNTOS DE INTERÉS</h3>
                     <div id="lista-puntos"></div>
@@ -535,6 +533,11 @@
     </div>
 
     <script>
+        // ===== CONEXIÓN A SUPABASE =====
+        const SUPABASE_URL = 'https://iwqeikrjhyqxyduvhhkg.supabase.co';
+        const SUPABASE_KEY = 'unsrhffwguwfebhppptz';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         // GENERAR ESTRELLAS
         for (let i = 0; i < 150; i++) {
             const estrella = document.createElement('div');
@@ -544,14 +547,6 @@
             estrella.style.animationDelay = Math.random() * 3 + 's';
             document.getElementById('estrellas').appendChild(estrella);
         }
-
-        // ===== DATOS DEL PERSONAJE =====
-        const personaje = {
-            nombre: 'KAELEN',
-            raza: 'EL FÉNIX',
-            rango: 'RANGO IV',
-            reino: 'astralith'
-        };
 
         // ===== DATOS DE LOS REINOS =====
         const reinos = {
@@ -602,31 +597,112 @@
             5: { nombre: 'PESCAR EN KAIDOM', tipo: 'trabajo', icono: 'trabajo', recompensa: '350 💎' }
         };
 
-        // ===== ACTUALIZAR INFO DEL PERSONAJE =====
-        document.getElementById('nombre-personaje').textContent = personaje.nombre;
-        document.getElementById('raza-personaje').textContent = personaje.raza;
-        document.getElementById('rango-personaje').textContent = personaje.rango;
-        document.getElementById('reino-actual').textContent = reinos[personaje.reino].nombre;
+        // ===== VARIABLES GLOBALES =====
+        let personaje = {
+            nombre: '---',
+            raza: '---',
+            rango: '---',
+            reino: null
+        };
 
-        // ===== CONFIGURAR REGIONES =====
-        const regiones = document.querySelectorAll('.region');
-        regiones.forEach(region => {
-            const reinoId = region.dataset.reino;
+        // ===== FUNCIÓN PARA DETERMINAR REINO SEGÚN LA RAZA =====
+        function determinarReinoPorRaza(raza) {
+            raza = raza.toUpperCase();
             
-            if (reinoId === personaje.reino) {
-                region.classList.add('seleccionada');
-            } else {
-                region.classList.add('bloqueada');
+            if (raza.includes('FÉNIX') || raza.includes('HADAS') || raza.includes('ÁNGELES') || 
+                raza.includes('CELESTIALES') || raza.includes('COATL')) {
+                return 'astralith';
+            }
+            
+            if (raza.includes('DEMONIO') || raza.includes('BASILISCO') || raza.includes('GÁRGOLA') ||
+                raza.includes('BANSHEE') || raza.includes('BERSERK')) {
+                return 'norum';
+            }
+            
+            if (raza.includes('CENTAURO') || raza.includes('QUIMERA') || raza.includes('GORGONA') ||
+                raza.includes('LOBO') || raza.includes('TROLL')) {
+                return 'thanatror';
+            }
+            
+            if (raza.includes('ELFO') || raza.includes('DUENDE') || raza.includes('ENANO') ||
+                raza.includes('GOLEM')) {
+                return 'balnath';
+            }
+            
+            if (raza.includes('SIRENA') || raza.includes('HIDRA') || raza.includes('NINFA') ||
+                raza.includes('KRAKEN') || raza.includes('MEGALODÓN')) {
+                return 'kaidom';
+            }
+            
+            return 'astralith'; // Por defecto
+        }
+
+        // ===== CARGAR DATOS DEL PERSONAJE =====
+        async function cargarPersonaje() {
+            const personajeActivo = localStorage.getItem('personajeActivo');
+            
+            if (!personajeActivo) {
+                window.location.href = 'login.html';
+                return;
             }
 
-            region.addEventListener('click', () => {
-                if (reinoId === personaje.reino) {
-                    mostrarInfoReino(reinoId);
-                } else {
-                    alert('* NO PERTENECES A ESTE REINO');
+            const { nombre } = JSON.parse(personajeActivo);
+
+            try {
+                const { data, error } = await supabase
+                    .from('personajes')
+                    .select('nombre, raza, rango')
+                    .eq('nombre', nombre)
+                    .single();
+
+                if (error || !data) {
+                    console.error('Error cargando personaje:', error);
+                    return;
                 }
+
+                personaje = {
+                    nombre: data.nombre,
+                    raza: data.raza,
+                    rango: data.rango,
+                    reino: determinarReinoPorRaza(data.raza)
+                };
+
+                // Actualizar interfaz
+                document.getElementById('nombre-personaje').textContent = personaje.nombre;
+                document.getElementById('raza-personaje').textContent = personaje.raza;
+                document.getElementById('rango-personaje').textContent = personaje.rango;
+                document.getElementById('reino-actual').textContent = reinos[personaje.reino].nombre;
+
+                // Configurar regiones
+                configurarRegiones();
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== CONFIGURAR REGIONES =====
+        function configurarRegiones() {
+            const regiones = document.querySelectorAll('.region');
+            
+            regiones.forEach(region => {
+                const reinoId = region.dataset.reino;
+                
+                if (reinoId === personaje.reino) {
+                    region.classList.add('seleccionada');
+                } else {
+                    region.classList.add('bloqueada');
+                }
+
+                region.addEventListener('click', () => {
+                    if (reinoId === personaje.reino) {
+                        mostrarInfoReino(reinoId);
+                    } else {
+                        alert('* NO PERTENECES A ESTE REINO');
+                    }
+                });
             });
-        });
+        }
 
         // ===== MOSTRAR INFO DEL REINO =====
         function mostrarInfoReino(reinoId) {
@@ -676,6 +752,9 @@
         function cerrarInfo() {
             document.getElementById('info-region').classList.remove('visible');
         }
+
+        // ===== INICIALIZAR =====
+        cargarPersonaje();
     </script>
 </body>
 </html>
