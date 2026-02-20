@@ -30,13 +30,12 @@
             overflow: hidden;
         }
 
-        .fondo-estrellas {
+        .estrellas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #0a0a1a;
             z-index: 0;
         }
 
@@ -44,38 +43,23 @@
             position: absolute;
             width: 2px;
             height: 2px;
-            background: white;
-            animation: parpadear 2s infinite alternate;
+            background: #ffffff;
+            opacity: 0;
+            animation: parpadear 3s infinite;
         }
 
         @keyframes parpadear {
-            from { opacity: 0.2; }
-            to { opacity: 1; }
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
         }
 
-        .particula-color {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: flotarColor 8s linear infinite;
-            z-index: 1;
-        }
-
-        @keyframes flotarColor {
-            0% { transform: translateY(0) translateX(0); opacity: 0.8; }
-            100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
-        }
-
-        .contenedor {
+        .caja-undertale {
             position: relative;
             z-index: 10;
-            max-width: 800px;
+            max-width: 700px;
             width: 100%;
+            border: 3px solid #ffffff;
             background: #000000;
-            border: 6px solid #ffffff;
-            box-shadow: 0 0 0 6px #000000, 0 0 0 12px #7f7f7f;
             padding: 40px 30px;
             animation: aparecer 0.5s steps(10) forwards;
         }
@@ -86,24 +70,19 @@
         }
 
         h1 {
-            text-align: center;
-            color: #ffff00;
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin-bottom: 30px;
-            text-shadow: 4px 4px 0 #ff0000;
-            letter-spacing: 4px;
+            text-align: center;
+            font-weight: normal;
+            letter-spacing: 6px;
+            color: #ffffff;
         }
 
         .linea {
-            height: 4px;
-            background: linear-gradient(90deg, transparent, #ffffff, #ffff00, #ffffff, transparent);
-            margin: 20px 0;
-            animation: moverLinea 3s infinite;
-        }
-
-        @keyframes moverLinea {
-            0% { background-position: -200px; }
-            100% { background-position: 200px; }
+            width: 100%;
+            height: 3px;
+            background: #ffffff;
+            margin: 20px 0 30px;
         }
 
         .subtitulo {
@@ -111,7 +90,7 @@
             color: #7f7f7f;
             font-size: 0.9rem;
             margin-bottom: 40px;
-            border-bottom: 2px solid #7f7f7f;
+            border-bottom: 2px solid #444444;
             padding-bottom: 20px;
         }
 
@@ -126,82 +105,78 @@
 
         .campo label {
             display: block;
-            color: #ffff00;
+            color: #ffff66;
             font-size: 0.8rem;
             margin-bottom: 10px;
         }
 
         .campo input, .campo select {
             width: 100%;
-            background: #0a0a1a;
-            border: 4px solid #7f7f7f;
-            color: #00ff00;
+            padding: 15px;
+            background: #000000;
+            border: 2px solid #ffffff;
+            color: #ffffff;
             font-family: 'Press Start 2P', monospace;
             font-size: 0.8rem;
-            padding: 15px;
             outline: none;
         }
 
         .campo input:focus, .campo select:focus {
-            border-color: #ffff00;
+            border-color: #ffff66;
         }
 
         .campo input::placeholder {
-            color: #3f3f3f;
+            color: #444444;
             font-size: 0.6rem;
         }
 
-        .btn {
+        .btn-undertale {
             width: 100%;
-            background: #1a1a2a;
-            border: 6px solid #7f7f7f;
+            background: #000000;
+            border: 2px solid #ffffff;
             color: white;
             font-family: 'Press Start 2P', monospace;
             font-size: 1.2rem;
             padding: 20px;
             cursor: pointer;
-            box-shadow: 8px 8px 0 #0a0a1a;
-            transition: all 0.05s step-end;
-            margin: 30px 0 20px;
+            transition: all 0.1s;
+            margin: 20px 0;
         }
 
-        .btn:hover {
-            border-color: #ffff00;
-            color: #ffff00;
-            transform: translate(-2px, -2px);
-            box-shadow: 10px 10px 0 #0a0a1a;
+        .btn-undertale:hover {
+            border-color: #ffff66;
+            color: #ffff66;
+            animation: temblor 0.1s infinite;
         }
 
-        .btn:active {
-            transform: translate(4px, 4px);
-            box-shadow: 4px 4px 0 #0a0a1a;
+        @keyframes temblor {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(1px, -1px); }
+            50% { transform: translate(-1px, 1px); }
+            75% { transform: translate(1px, 1px); }
+            100% { transform: translate(-1px, -1px); }
         }
 
-        .mensaje {
+        .mensaje-flotante {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             padding: 30px;
             background: #000000;
-            border-width: 6px;
-            border-style: solid;
+            border: 3px solid #ffffff;
             z-index: 1000;
             text-align: center;
             line-height: 2;
             animation: aparecerMensaje 0.2s steps(5);
         }
 
-        .mensaje.error {
-            border-color: #ff0000;
-            background: #330000;
-            color: white;
+        .mensaje-flotante.exito {
+            border-color: #55ff55;
         }
 
-        .mensaje.exito {
-            border-color: #00ff00;
-            background: #003300;
-            color: white;
+        .mensaje-flotante.error {
+            border-color: #ff5555;
         }
 
         @keyframes aparecerMensaje {
@@ -209,31 +184,25 @@
             to { transform: translate(-50%, -50%) scale(1); }
         }
 
-        @keyframes temblor {
-            0%,100% { transform: translateX(0); }
-            10%,30%,50%,70%,90% { transform: translateX(-5px); }
-            20%,40%,60%,80% { transform: translateX(5px); }
-        }
-
-        .temblor {
-            animation: temblor 0.3s steps(5);
-        }
-
         .footer {
             text-align: center;
             color: #7f7f7f;
             font-size: 0.7rem;
             margin-top: 30px;
-            border-top: 2px solid #7f7f7f;
+            border-top: 2px solid #444444;
             padding-top: 20px;
+        }
+
+        .footer::before {
+            content: "* ";
+            color: #ffff66;
         }
     </style>
 </head>
 <body>
-    <div class="fondo-estrellas" id="fondo"></div>
-    <div id="particulas"></div>
+    <div class="estrellas" id="estrellas"></div>
 
-    <div class="contenedor" id="contenedor">
+    <div class="caja-undertale">
         <h1>Í G N E O</h1>
         <div class="linea"></div>
         <div class="subtitulo">ACCESO AL PERSONAJE</div>
@@ -241,119 +210,131 @@
         <div class="formulario">
             <div class="campo">
                 <label>NOMBRE DEL PERSONAJE</label>
-                <input type="text" id="nombrePersonaje" placeholder="ej: Kaelen Fenrir">
+                <input type="text" id="nombrePersonaje" placeholder="EJ: KAELEN" autocomplete="off">
             </div>
 
             <div class="campo">
                 <label>CASTA / RANGO</label>
                 <select id="rango">
                     <option value="">SELECCIONAR</option>
-                    <option>Rango I: Divino</option>
-                    <option>Rango II: Alta Nobleza</option>
-                    <option>Rango III: Nobleza/Gobierno</option>
-                    <option>Rango IV: Élite/Protector</option>
-                    <option>Rango V: Ciudadano/Guerrero</option>
-                    <option>Rango VI: Común/Sirviente</option>
-                    <option>Rango VII: Inferior/Exiliado</option>
+                    <option>RANGO I: DIVINO</option>
+                    <option>RANGO II: ALTA NOBLEZA</option>
+                    <option>RANGO III: NOBLEZA/GOBIERNO</option>
+                    <option>RANGO IV: ÉLITE/PROTECTOR</option>
+                    <option>RANGO V: CIUDADANO/GUERRERO</option>
+                    <option>RANGO VI: COMÚN/SIRVIENTE</option>
+                    <option>RANGO VII: INFERIOR/EXILIADO</option>
                 </select>
             </div>
 
             <div class="campo">
                 <label>LLAVE ÚNICA DE ACCESO</label>
-                <input type="text" id="llaveUnica" placeholder="XXX-XXX-XXX">
+                <input type="text" id="llaveUnica" placeholder="XXX-XXX-XXX" autocomplete="off">
             </div>
 
-            <button class="btn" id="btnAcceder">▶ ACCEDER ◀</button>
+            <button class="btn-undertale" id="btnAcceder">▶ ACCEDER ◀</button>
         </div>
 
         <div class="footer">
-            * SOLO LOS DIGNOS TRASPASAN ESTE UMBRAL *
+            SOLO LOS DIGNOS TRASPASAN ESTE UMBRAL
         </div>
     </div>
 
     <script>
-        // Generar estrellas
-        const fondo = document.getElementById('fondo');
-        for (let i = 0; i < 200; i++) {
+        // GENERAR ESTRELLAS
+        for (let i = 0; i < 150; i++) {
             const estrella = document.createElement('div');
             estrella.className = 'estrella';
             estrella.style.left = Math.random() * 100 + '%';
             estrella.style.top = Math.random() * 100 + '%';
             estrella.style.animationDelay = Math.random() * 3 + 's';
-            fondo.appendChild(estrella);
+            document.getElementById('estrellas').appendChild(estrella);
         }
 
-        // Generar partículas arcoíris
-        const particulas = document.getElementById('particulas');
-        const colores = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff', '#ff00ff'];
-        
-        for (let i = 0; i < 50; i++) {
-            const p = document.createElement('div');
-            p.className = 'particula-color';
-            p.style.left = Math.random() * 100 + '%';
-            p.style.top = Math.random() * 100 + '%';
-            p.style.background = colores[Math.floor(Math.random() * colores.length)];
-            p.style.animationDelay = Math.random() * 5 + 's';
-            p.style.animationDuration = (5 + Math.random() * 10) + 's';
-            particulas.appendChild(p);
-        }
+        // ===== PERSONAJES APROBADOS (SIMULACIÓN) =====
+        const personajesAprobados = {
+            'KAELEN': { rango: 'RANGO IV: ÉLITE/PROTECTOR', llave: 'FEN-123-RIX' },
+            'LUMINA': { rango: 'RANGO V: CIUDADANO/GUERRERO', llave: 'LUM-456-HAD' },
+            'DRAKTHAR': { rango: 'RANGO IV: ÉLITE/PROTECTOR', llave: 'DRA-789-KIN' },
+            'ELARA': { rango: 'RANGO VI: COMÚN/SIRVIENTE', llave: 'ELA-321-SIR' },
+            'THORN': { rango: 'RANGO III: NOBLEZA/GOBIERNO', llave: 'THO-654-NOB' }
+        };
 
-        const contenedor = document.getElementById('contenedor');
-        const nombreInput = document.getElementById('nombrePersonaje');
-        const rangoSelect = document.getElementById('rango');
-        const llaveInput = document.getElementById('llaveUnica');
-        const btnAcceder = document.getElementById('btnAcceder');
-
+        // ===== FUNCIÓN PARA MOSTRAR MENSAJES =====
         function mostrarMensaje(texto, tipo) {
             const mensaje = document.createElement('div');
-            mensaje.className = 'mensaje ' + tipo;
+            mensaje.className = `mensaje-flotante ${tipo}`;
             mensaje.textContent = texto;
             document.body.appendChild(mensaje);
             setTimeout(() => mensaje.remove(), 3000);
         }
 
-        // Simulación de personajes aprobados (esto luego se conectará a Supabase)
-        const personajesAprobados = {
-            'KAELEN FENRIR': { rango: 'Rango IV: Élite/Protector', llave: 'FEN-123-RIX' },
-            'LUMINA HADA': { rango: 'Rango V: Ciudadano/Guerrero', llave: 'LUM-456-HAD' },
-            'DRAKTHAR': { rango: 'Rango IV: Élite/Protector', llave: 'DRA-789-KIN' }
-        };
+        // ===== VALIDAR ACCESO =====
+        function validarAcceso() {
+            const nombre = document.getElementById('nombrePersonaje').value.trim().toUpperCase();
+            const rango = document.getElementById('rango').value;
+            const llave = document.getElementById('llaveUnica').value.trim();
 
-        btnAcceder.addEventListener('click', function() {
-            const nombre = nombreInput.value.trim().toUpperCase();
-            const rango = rangoSelect.value;
-            const llave = llaveInput.value.trim();
-
+            // VALIDAR CAMPOS VACÍOS
             if (!nombre || !rango || !llave) {
-                mostrarMensaje('COMPLETA TODOS LOS CAMPOS', 'error');
-                contenedor.classList.add('temblor');
-                setTimeout(() => contenedor.classList.remove('temblor'), 300);
-                return;
+                mostrarMensaje('* COMPLETA TODOS LOS CAMPOS', 'error');
+                return false;
             }
 
+            // BUSCAR PERSONAJE
             const personaje = personajesAprobados[nombre];
 
-            if (personaje && personaje.rango === rango && personaje.llave === llave) {
-                mostrarMensaje(`✨ BIENVENIDO, ${nombre} ✨`, 'exito');
-                
-                setTimeout(() => {
-                    window.location.href = 'menu-desbloqueado.html';
-                }, 2000);
-            } else {
-                mostrarMensaje('❌ CREDENCIALES INCORRECTAS', 'error');
-                contenedor.classList.add('temblor');
-                setTimeout(() => contenedor.classList.remove('temblor'), 300);
-                llaveInput.value = '';
-                llaveInput.focus();
+            if (!personaje) {
+                mostrarMensaje('* PERSONAJE NO ENCONTRADO', 'error');
+                return false;
+            }
+
+            if (personaje.rango !== rango) {
+                mostrarMensaje('* RANGO INCORRECTO', 'error');
+                return false;
+            }
+
+            if (personaje.llave !== llave) {
+                mostrarMensaje('* LLAVE INCORRECTA', 'error');
+                return false;
+            }
+
+            // ACCESO EXITOSO
+            mostrarMensaje(`* BIENVENIDO, ${nombre}`, 'exito');
+            
+            // GUARDAR SESIÓN (SIMULADO)
+            localStorage.setItem('personajeActivo', JSON.stringify({
+                nombre: nombre,
+                rango: rango,
+                llave: llave
+            }));
+
+            // REDIRIGIR AL MENÚ DESBLOQUEADO
+            setTimeout(() => {
+                window.location.href = 'menu-desbloqueado.html';
+            }, 1500);
+
+            return true;
+        }
+
+        // ===== EVENTO DEL BOTÓN =====
+        document.getElementById('btnAcceder').addEventListener('click', validarAcceso);
+
+        // ===== EVENTO DE TECLADO (ENTER) =====
+        document.getElementById('llaveUnica').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validarAcceso();
             }
         });
 
-        // Permitir Enter
-        llaveInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                btnAcceder.click();
-            }
-        });
+        // ===== CARGAR ÚLTIMO PERSONAJE (OPCIONAL) =====
+        const ultimoPersonaje = localStorage.getItem('personajeActivo');
+        if (ultimoPersonaje) {
+            const datos = JSON.parse(ultimoPersonaje);
+            document.getElementById('nombrePersonaje').value = datos.nombre;
+            document.getElementById('rango').value = datos.rango;
+            // NO CARGAMOS LA LLAVE POR SEGURIDAD
+        }
     </script>
 </body>
 </html>
