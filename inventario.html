@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÍGNEO - INVENTARIO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -392,24 +393,24 @@
         <div class="info-superior">
             <div class="cristales">
                 <span class="label">CRISTALES:</span>
-                <span class="valor" id="cristales">2450</span>
+                <span class="valor" id="cristales">0</span>
             </div>
             <div class="stats-equipadas" id="stats-container">
                 <div class="stat-equipada">
                     <div class="label">FUERZA</div>
-                    <div class="valor" id="stat-fuerza">145</div>
+                    <div class="valor" id="stat-fuerza">0</div>
                 </div>
                 <div class="stat-equipada">
                     <div class="label">MAGIA</div>
-                    <div class="valor" id="stat-magia">180</div>
+                    <div class="valor" id="stat-magia">0</div>
                 </div>
                 <div class="stat-equipada">
                     <div class="label">ESENCIA</div>
-                    <div class="valor" id="stat-esencia">165</div>
+                    <div class="valor" id="stat-esencia">0</div>
                 </div>
                 <div class="stat-equipada">
                     <div class="label">VIDA</div>
-                    <div class="valor" id="stat-vida">220</div>
+                    <div class="valor" id="stat-vida">0</div>
                 </div>
             </div>
         </div>
@@ -454,6 +455,11 @@
     </div>
 
     <script>
+        // ===== CONEXIÓN A SUPABASE =====
+        const SUPABASE_URL = 'https://iwqeikrjhyqxyduvhhkg.supabase.co';
+        const SUPABASE_KEY = 'unsrhffwguwfebhppptz';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         // GENERAR ESTRELLAS
         for (let i = 0; i < 150; i++) {
             const estrella = document.createElement('div');
@@ -464,27 +470,83 @@
             document.getElementById('estrellas').appendChild(estrella);
         }
 
-        // ===== DATOS DEL INVENTARIO =====
+        // ===== VARIABLES GLOBALES =====
         let inventario = {
-            cristales: 2450,
+            cristales: 0,
             stats: {
-                fuerza: 145,
-                magia: 180,
-                esencia: 165,
-                vida: 220
+                fuerza: 0,
+                magia: 0,
+                esencia: 0,
+                vida: 0
             },
-            objetos: [
-                { id: 1, nombre: 'NÉCTAR DE YGGDRASIL', tipo: 'consumible', cantidad: 3, equipado: false, icono: 'pocion', stats: { fuerza: 150, magia: 100, esencia: -30, vida: 50 } },
-                { id: 2, nombre: 'ESPADA DE HIERRO', tipo: 'equipo', cantidad: 1, equipado: false, icono: 'espada', stats: { fuerza: 30, magia: 0, esencia: -20, vida: 0 } },
-                { id: 3, nombre: 'POCIÓN DE VIDA', tipo: 'consumible', cantidad: 5, equipado: false, icono: 'pocion', stats: { fuerza: 0, magia: 0, esencia: 0, vida: 100 } },
-                { id: 4, nombre: 'DAGA DE BASILISCO', tipo: 'equipo', cantidad: 1, equipado: false, icono: 'daga', stats: { fuerza: -20, magia: 25, esencia: -5, vida: 0 } },
-                { id: 5, nombre: 'ARMADURA DE CUERO', tipo: 'equipo', cantidad: 1, equipado: false, icono: 'armadura', stats: { fuerza: 5, magia: 0, esencia: 0, vida: 50 } },
-                { id: 6, nombre: 'MIEL DE HADA', tipo: 'consumible', cantidad: 2, equipado: false, icono: 'pocion', stats: { fuerza: 60, magia: 50, esencia: 2, vida: 15 } }
-            ],
+            objetos: [],
             historial: []
         };
 
         let objetoSeleccionado = null;
+
+        // ===== CARGAR DATOS DESDE SUPABASE =====
+        async function cargarInventario() {
+            // Obtener personaje activo de localStorage
+            const personajeActivo = localStorage.getItem('personajeActivo');
+            
+            if (!personajeActivo) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const { id: personajeId, nombre } = JSON.parse(personajeActivo);
+
+            try {
+                // Cargar datos del personaje (cristales y stats)
+                const { data: personajeData, error: personajeError } = await supabase
+                    .from('personajes')
+                    .select('dinero, fuerza, magia, esencia, vida')
+                    .eq('id', personajeId)
+                    .single();
+
+                if (!personajeError && personajeData) {
+                    inventario.cristales = personajeData.dinero || 0;
+                    inventario.stats.fuerza = personajeData.fuerza || 100;
+                    inventario.stats.magia = personajeData.magia || 100;
+                    inventario.stats.esencia = personajeData.esencia || 100;
+                    inventario.stats.vida = personajeData.vida || 100;
+                }
+
+                // Cargar inventario del personaje
+                const { data: inventarioData, error: inventarioError } = await supabase
+                    .from('inventario')
+                    .select('*')
+                    .eq('personaje_id', personajeId);
+
+                if (!inventarioError && inventarioData) {
+                    inventario.objetos = inventarioData.map(item => ({
+                        id: item.id,
+                        nombre: item.nombre || 'Objeto',
+                        tipo: item.tipo || 'equipo',
+                        cantidad: item.cantidad || 1,
+                        equipado: item.equipado || false,
+                        icono: item.icono || 'default',
+                        stats: item.stats || { fuerza: 0, magia: 0, esencia: 0, vida: 0 }
+                    }));
+                }
+
+                // Cargar historial (si tienes tabla de historial)
+                // Por ahora usamos datos de ejemplo
+                inventario.historial = [
+                    { accion: 'EQUIPAR', objeto: 'ESPADA DE HIERRO', fecha: new Date().toLocaleDateString('es-ES') },
+                    { accion: 'COMPRA', objeto: 'NÉCTAR DE YGGDRASIL', fecha: new Date().toLocaleDateString('es-ES') }
+                ];
+
+                // Actualizar la interfaz
+                actualizarStatsDisplay();
+                renderizarInventario();
+                renderizarHistorial();
+
+            } catch (error) {
+                console.error('Error cargando inventario:', error);
+            }
+        }
 
         // ===== FUNCIONES DE UTILIDAD =====
         function actualizarStatsDisplay() {
@@ -505,12 +567,14 @@
             return clases[icono] || 'icono-default';
         }
 
-        function agregarHistorial(accion, objeto) {
+        async function agregarHistorial(accion, objeto) {
+            // Aquí podrías guardar en Supabase si tienes tabla de historial
             inventario.historial.unshift({
                 accion: accion,
                 objeto: objeto.nombre,
                 fecha: new Date().toLocaleDateString('es-ES')
             });
+            renderizarHistorial();
         }
 
         // ===== RENDERIZAR INVENTARIO =====
@@ -618,8 +682,8 @@
             objetoSeleccionado = null;
         }
 
-        // ===== ACCIONES =====
-        function equiparObjeto() {
+        // ===== ACCIONES CON SUPABASE =====
+        async function equiparObjeto() {
             if (!objetoSeleccionado) return;
             
             // Contar cuántos equipados hay
@@ -631,75 +695,102 @@
                 return;
             }
             
-            // Equipar objeto
-            objetoSeleccionado.equipado = true;
-            
-            // Aplicar stats
-            inventario.stats.fuerza += objetoSeleccionado.stats.fuerza;
-            inventario.stats.magia += objetoSeleccionado.stats.magia;
-            inventario.stats.esencia += objetoSeleccionado.stats.esencia;
-            inventario.stats.vida += objetoSeleccionado.stats.vida;
-            
-            // Agregar al historial
-            agregarHistorial('EQUIPAR', objetoSeleccionado);
-            
-            // Actualizar todo
-            actualizarStatsDisplay();
-            renderizarInventario();
-            renderizarHistorial();
-            
-            cerrarModal();
-        }
+            // Actualizar en Supabase
+            const { error } = await supabase
+                .from('inventario')
+                .update({ equipado: true })
+                .eq('id', objetoSeleccionado.id);
 
-        function quitarObjeto() {
-            if (!objetoSeleccionado) return;
-            
-            // Desequipar objeto
-            objetoSeleccionado.equipado = false;
-            
-            // Quitar stats
-            inventario.stats.fuerza -= objetoSeleccionado.stats.fuerza;
-            inventario.stats.magia -= objetoSeleccionado.stats.magia;
-            inventario.stats.esencia -= objetoSeleccionado.stats.esencia;
-            inventario.stats.vida -= objetoSeleccionado.stats.vida;
-            
-            // Agregar al historial
-            agregarHistorial('DESEQUIPAR', objetoSeleccionado);
-            
-            // Actualizar todo
-            actualizarStatsDisplay();
-            renderizarInventario();
-            renderizarHistorial();
-            
-            cerrarModal();
-        }
-
-        function usarObjeto() {
-            if (!objetoSeleccionado) return;
-            
-            // Reducir cantidad
-            objetoSeleccionado.cantidad--;
-            
-            // Agregar al historial
-            agregarHistorial('USAR', objetoSeleccionado);
-            
-            // Si llega a 0, eliminar
-            if (objetoSeleccionado.cantidad === 0) {
-                // Si estaba equipado, quitar stats
-                if (objetoSeleccionado.equipado) {
-                    inventario.stats.fuerza -= objetoSeleccionado.stats.fuerza;
-                    inventario.stats.magia -= objetoSeleccionado.stats.magia;
-                    inventario.stats.esencia -= objetoSeleccionado.stats.esencia;
-                    inventario.stats.vida -= objetoSeleccionado.stats.vida;
-                }
-                // Eliminar del array
-                inventario.objetos = inventario.objetos.filter(o => o.id !== objetoSeleccionado.id);
+            if (!error) {
+                // Equipar objeto
+                objetoSeleccionado.equipado = true;
+                
+                // Aplicar stats
+                inventario.stats.fuerza += objetoSeleccionado.stats.fuerza;
+                inventario.stats.magia += objetoSeleccionado.stats.magia;
+                inventario.stats.esencia += objetoSeleccionado.stats.esencia;
+                inventario.stats.vida += objetoSeleccionado.stats.vida;
+                
+                // Agregar al historial
+                await agregarHistorial('EQUIPAR', objetoSeleccionado);
+                
+                // Actualizar todo
+                actualizarStatsDisplay();
+                renderizarInventario();
             }
             
+            cerrarModal();
+        }
+
+        async function quitarObjeto() {
+            if (!objetoSeleccionado) return;
+            
+            // Actualizar en Supabase
+            const { error } = await supabase
+                .from('inventario')
+                .update({ equipado: false })
+                .eq('id', objetoSeleccionado.id);
+
+            if (!error) {
+                // Desequipar objeto
+                objetoSeleccionado.equipado = false;
+                
+                // Quitar stats
+                inventario.stats.fuerza -= objetoSeleccionado.stats.fuerza;
+                inventario.stats.magia -= objetoSeleccionado.stats.magia;
+                inventario.stats.esencia -= objetoSeleccionado.stats.esencia;
+                inventario.stats.vida -= objetoSeleccionado.stats.vida;
+                
+                // Agregar al historial
+                await agregarHistorial('DESEQUIPAR', objetoSeleccionado);
+                
+                // Actualizar todo
+                actualizarStatsDisplay();
+                renderizarInventario();
+            }
+            
+            cerrarModal();
+        }
+
+        async function usarObjeto() {
+            if (!objetoSeleccionado) return;
+            
+            if (objetoSeleccionado.cantidad <= 1) {
+                // Eliminar de Supabase
+                const { error } = await supabase
+                    .from('inventario')
+                    .delete()
+                    .eq('id', objetoSeleccionado.id);
+
+                if (!error) {
+                    // Si estaba equipado, quitar stats
+                    if (objetoSeleccionado.equipado) {
+                        inventario.stats.fuerza -= objetoSeleccionado.stats.fuerza;
+                        inventario.stats.magia -= objetoSeleccionado.stats.magia;
+                        inventario.stats.esencia -= objetoSeleccionado.stats.esencia;
+                        inventario.stats.vida -= objetoSeleccionado.stats.vida;
+                    }
+                    // Eliminar del array local
+                    inventario.objetos = inventario.objetos.filter(o => o.id !== objetoSeleccionado.id);
+                }
+            } else {
+                // Actualizar cantidad en Supabase
+                const { error } = await supabase
+                    .from('inventario')
+                    .update({ cantidad: objetoSeleccionado.cantidad - 1 })
+                    .eq('id', objetoSeleccionado.id);
+
+                if (!error) {
+                    objetoSeleccionado.cantidad--;
+                }
+            }
+            
+            // Agregar al historial
+            await agregarHistorial('USAR', objetoSeleccionado);
+            
             // Actualizar todo
             actualizarStatsDisplay();
             renderizarInventario();
-            renderizarHistorial();
             
             cerrarModal();
         }
@@ -723,9 +814,7 @@
         }
 
         // ===== INICIALIZAR =====
-        actualizarStatsDisplay();
-        renderizarInventario();
-        renderizarHistorial();
+        cargarInventario();
 
         // Hacer funciones globales
         window.cambiarTab = cambiarTab;
