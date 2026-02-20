@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÍGNEO - SALA DEL CONSEJO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -67,11 +68,39 @@
 
         h1 {
             font-size: 2.5rem;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             text-align: center;
             font-weight: normal;
             letter-spacing: 6px;
             color: #ffffff;
+        }
+
+        /* Info del personaje en la parte superior */
+        .info-personaje {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid #ffffff;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            font-size: 0.8rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .info-label {
+            color: #7f7f7f;
+            font-size: 0.5rem;
+            margin-bottom: 5px;
+        }
+
+        .info-valor {
+            color: #ffff66;
+            font-size: 0.7rem;
         }
 
         .linea {
@@ -208,6 +237,27 @@
 
     <div class="caja-undertale">
         <h1>Í G N E O</h1>
+        
+        <!-- INFO DEL PERSONAJE (se carga desde Supabase) -->
+        <div class="info-personaje" id="info-personaje">
+            <div class="info-item">
+                <div class="info-label">PERSONAJE</div>
+                <div class="info-valor" id="nombre-personaje">---</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">RAZA</div>
+                <div class="info-valor" id="raza-personaje">---</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">RANGO</div>
+                <div class="info-valor" id="rango-personaje">---</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">CRISTALES</div>
+                <div class="info-valor" id="cristales-personaje">0</div>
+            </div>
+        </div>
+
         <div class="linea"></div>
 
         <!-- GRID DE OPCIONES (5 botones - todos accesibles) -->
@@ -246,19 +296,17 @@
 
             <!-- HISTORIAL (oculto inicialmente) -->
             <div class="historial" id="historial">
-                <p><span>ENTRADA</span> - Acceso al sistema <span class="fecha">19/02/2026</span></p>
-                <p><span>PERSONAJE</span> - Kaelen visitó su ficha <span class="fecha">19/02/2026</span></p>
-                <p><span>INVENTARIO</span> - Revisó sus objetos <span class="fecha">19/02/2026</span></p>
-                <p><span>TIENDA</span> - Visitó El Cáliz Eterno <span class="fecha">19/02/2026</span></p>
-                <p><span>MUNDO</span> - Exploró Kaidom <span class="fecha">18/02/2026</span></p>
-                <p><span>TRABAJO</span> - Aceptó misión "Cazar lobos" <span class="fecha">18/02/2026</span></p>
-                <p><span>COMPRA</span> - Adquirió Néctar de Yggdrasil <span class="fecha">18/02/2026</span></p>
-                <p><span>LOGRO</span> - Primer personaje creado <span class="fecha">17/02/2026</span></p>
+                <!-- Se cargará dinámicamente -->
             </div>
         </div>
     </div>
 
     <script>
+        // ===== CONEXIÓN A SUPABASE =====
+        const SUPABASE_URL = 'https://iwqeikrjhyqxyduvhhkg.supabase.co';
+        const SUPABASE_KEY = 'unsrhffwguwfebhppptz';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         // GENERAR ESTRELLAS
         const estrellas = document.getElementById('estrellas');
         for (let i = 0; i < 150; i++) {
@@ -270,15 +318,92 @@
             estrellas.appendChild(estrella);
         }
 
-        // FUNCIÓN PARA MOSTRAR/OCULTAR HISTORIAL
+        // ===== CARGAR DATOS DEL PERSONAJE =====
+        async function cargarDatosPersonaje() {
+            // Obtener personaje activo de localStorage
+            const personajeActivo = localStorage.getItem('personajeActivo');
+            
+            if (!personajeActivo) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const { nombre } = JSON.parse(personajeActivo);
+
+            try {
+                const { data, error } = await supabase
+                    .from('personajes')
+                    .select('nombre, raza, rango, dinero')
+                    .eq('nombre', nombre)
+                    .single();
+
+                if (error || !data) {
+                    console.error('Error cargando personaje:', error);
+                    return;
+                }
+
+                // Actualizar la interfaz con los datos del personaje
+                document.getElementById('nombre-personaje').textContent = data.nombre;
+                document.getElementById('raza-personaje').textContent = data.raza;
+                document.getElementById('rango-personaje').textContent = data.rango;
+                document.getElementById('cristales-personaje').textContent = data.dinero || 0;
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== CARGAR HISTORIAL DE ACTIVIDAD =====
+        async function cargarHistorial() {
+            // Por ahora usamos datos de ejemplo
+            // Más adelante podrías tener una tabla de historial en Supabase
+            const historialDiv = document.getElementById('historial');
+            
+            const historialEjemplo = [
+                { accion: 'ENTRADA', desc: 'Acceso al sistema', fecha: '19/02/2026' },
+                { accion: 'PERSONAJE', desc: 'Kaelen visitó su ficha', fecha: '19/02/2026' },
+                { accion: 'INVENTARIO', desc: 'Revisó sus objetos', fecha: '19/02/2026' },
+                { accion: 'TIENDA', desc: 'Visitó El Cáliz Eterno', fecha: '19/02/2026' },
+                { accion: 'MUNDO', desc: 'Exploró Kaidom', fecha: '18/02/2026' },
+                { accion: 'TRABAJO', desc: 'Aceptó misión "Cazar lobos"', fecha: '18/02/2026' },
+                { accion: 'COMPRA', desc: 'Adquirió Néctar de Yggdrasil', fecha: '18/02/2026' },
+                { accion: 'LOGRO', desc: 'Primer personaje creado', fecha: '17/02/2026' }
+            ];
+
+            historialDiv.innerHTML = '';
+            
+            historialEjemplo.forEach(item => {
+                const p = document.createElement('p');
+                p.innerHTML = `<span>${item.accion}</span> - ${item.desc} <span class="fecha">${item.fecha}</span>`;
+                historialDiv.appendChild(p);
+            });
+        }
+
+        // ===== FUNCIÓN PARA MOSTRAR/OCULTAR HISTORIAL =====
         function toggleHistorial() {
             const historial = document.getElementById('historial');
             historial.classList.toggle('visible');
         }
 
-        // OPCIONAL: Registrar entrada en historial (simulado)
-        // En una implementación real, esto se conectaría a Supabase
-        console.log('Historial cargado');
+        // ===== REGISTRAR ACCIÓN EN HISTORIAL (OPCIONAL) =====
+        async function registrarAccion(accion, descripcion) {
+            // Aquí podrías guardar en Supabase si tienes una tabla de historial
+            console.log(`Acción registrada: ${accion} - ${descripcion}`);
+            
+            // También podrías agregar al historial visible
+            const historialDiv = document.getElementById('historial');
+            const p = document.createElement('p');
+            const fecha = new Date().toLocaleDateString('es-ES');
+            p.innerHTML = `<span>${accion}</span> - ${descripcion} <span class="fecha">${fecha}</span>`;
+            historialDiv.appendChild(p);
+        }
+
+        // ===== INICIALIZAR =====
+        cargarDatosPersonaje();
+        cargarHistorial();
+
+        // Registrar entrada actual
+        registrarAccion('ENTRADA', 'Acceso al sistema');
     </script>
 </body>
 </html>
