@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÍGNEO - CREAR PERSONAJE</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -573,6 +574,11 @@
     </div>
 
     <script>
+        // ===== CONEXIÓN A SUPABASE =====
+        const SUPABASE_URL = 'https://iwqeikrjhyqxyduvhhkg.supabase.co';
+        const SUPABASE_KEY = 'unsrhffwguwfebhppptz';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         // GENERAR ESTRELLAS
         const estrellas = document.getElementById('estrellas');
         for (let i = 0; i < 150; i++) {
@@ -728,7 +734,12 @@
             }
 
             getValores() {
-                return this.valores;
+                // Devuelve un objeto con los valores de las habilidades
+                const resultado = {};
+                this.items.forEach((nombre, index) => {
+                    resultado[nombre] = this.valores[index];
+                });
+                return resultado;
             }
         }
 
@@ -739,11 +750,13 @@
         const socialManager = new BarraManager('social-container', 'contador-social', 14, social);
 
         // SUBIR IMAGEN
+        let imagenData = null;
         document.getElementById('cargar-imagen').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
+                    imagenData = event.target.result;
                     const img = document.getElementById('imagen-previa');
                     img.src = event.target.result;
                     img.style.display = 'block';
@@ -753,7 +766,7 @@
         });
 
         // FUNCIONES DE MENSAJE
-        function mostrarMensaje(texto) {
+        function mostrarMensaje(texto, tipo = 'normal') {
             document.getElementById('mensaje-texto').textContent = texto;
             document.getElementById('mensaje').style.display = 'block';
         }
@@ -762,15 +775,17 @@
             document.getElementById('mensaje').style.display = 'none';
         }
 
-        // VALIDAR Y ENVIAR
-        function enviarFormulario() {
-            const nombre = document.getElementById('nombre').value;
-            const email = document.getElementById('email').value;
+        // FUNCIÓN PARA OBTENER VALORES DE LAS BARRAS (ya integrada en BarraManager)
+
+        // FUNCIÓN PRINCIPAL DE ENVÍO
+        async function enviarFormulario() {
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
             const edad = document.getElementById('edad').value;
             const genero = document.getElementById('genero').value;
             const raza = document.getElementById('raza').value;
             const rango = document.getElementById('rango').value;
-            const altura = document.getElementById('altura').value;
+            const altura = document.getElementById('altura').value.trim();
 
             if (!nombre || !email || !edad || !genero || !raza || !rango || !altura) {
                 mostrarMensaje('* Completa todos los campos básicos.');
@@ -809,93 +824,54 @@
                 return;
             }
 
-            mostrarMensaje('* Solicitud enviada. Los guardianes la revisarán.');
-            setTimeout(() => {
-                window.location.href = 'menu.html';
-            }, 2000);
+            // Preparar datos para enviar a Supabase
+            const personajeData = {
+                nombre: nombre,
+                email: email,
+                raza: raza,
+                rango: rango,
+                edad: parseInt(edad),
+                genero: genero,
+                altura: altura,
+                imagen_url: imagenData || null,
+                habilidades: habManager.getValores(),
+                cuerpo: cuerpoManager.getValores(),
+                mente: menteManager.getValores(),
+                social: socialManager.getValores(),
+                opciones_exclusivas: {
+                    opcion1: opciones[0],
+                    opcion2: opciones[1],
+                    opcion3: opciones[2],
+                    opcion4: opciones[3]
+                },
+                estado: 'pendiente',
+                llave_unica: null
+            };
+
+            mostrarMensaje('* Enviando solicitud...');
+
+            try {
+                const { data, error } = await supabase
+                    .from('personajes')
+                    .insert([personajeData]);
+
+                if (error) throw error;
+
+                mostrarMensaje('* Solicitud enviada. Los guardianes la revisarán.');
+                
+                // Guardar copia local por si acaso
+                localStorage.setItem('ultimaSolicitud', JSON.stringify(personajeData));
+                
+                setTimeout(() => {
+                    window.location.href = 'menu.html';
+                }, 3000);
+
+            } catch (error) {
+                console.error('Error al guardar:', error);
+                mostrarMensaje('* Error al enviar. Guardado localmente.');
+                localStorage.setItem('solicitudPendiente', JSON.stringify(personajeData));
+            }
         }
     </script>
 </body>
 </html>
-
-// Función para guardar el personaje (PON ESTO EN formulario.html)
-function guardarPersonaje() {
-    // Crear objeto con todos los datos del personaje
-    const personajeData = {
-        // Datos básicos
-        nombre: document.getElementById('nombre').value,
-        email: document.getElementById('email').value,
-        raza: document.getElementById('raza').value,
-        rango: document.getElementById('rango').value,
-        edad: document.getElementById('edad').value,
-        genero: document.getElementById('genero').value,
-        altura: document.getElementById('altura').value,
-        imagen: imagenData || null,
-        
-        // Habilidades (valores de las barras)
-        habilidades: {
-            'PERSUASIÓN': obtenerValorBarra('habilidades', 0),
-            'COMUNICACIÓN': obtenerValorBarra('habilidades', 1),
-            'PERCEPCIÓN': obtenerValorBarra('habilidades', 2),
-            'MEDITACIÓN': obtenerValorBarra('habilidades', 3),
-            'ALFABETISMO': obtenerValorBarra('habilidades', 4),
-            'CREATIVIDAD': obtenerValorBarra('habilidades', 5),
-            'TECNOLOGÍA': obtenerValorBarra('habilidades', 6),
-            'COMBATE': obtenerValorBarra('habilidades', 7),
-            'SUPERVIVENCIA': obtenerValorBarra('habilidades', 8),
-            'COQUETA': obtenerValorBarra('habilidades', 9),
-            'SEDUCCIÓN': obtenerValorBarra('habilidades', 10),
-            'SUERTE': obtenerValorBarra('habilidades', 11)
-        },
-        
-        // Atributos
-        cuerpo: {
-            'DESTREZA': obtenerValorBarra('cuerpo', 0),
-            'SALUD': obtenerValorBarra('cuerpo', 1),
-            'ENERGÍA': obtenerValorBarra('cuerpo', 2),
-            'BELLEZA': obtenerValorBarra('cuerpo', 3),
-            'ESTILO': obtenerValorBarra('cuerpo', 4)
-        },
-        
-        mente: {
-            'INTELIGENCIA': obtenerValorBarra('mente', 0),
-            'FELICIDAD': obtenerValorBarra('mente', 1),
-            'ESPIRITUALIDAD': obtenerValorBarra('mente', 2),
-            'CONFIANZA': obtenerValorBarra('mente', 3)
-        },
-        
-        social: {
-            'CARISMA': obtenerValorBarra('social', 0),
-            'EMPATÍA': obtenerValorBarra('social', 1),
-            'AGRESIVIDAD': obtenerValorBarra('social', 2),
-            'GENEROSIDAD': obtenerValorBarra('social', 3),
-            'RIQUEZA': obtenerValorBarra('social', 4),
-            'LIBIDO': obtenerValorBarra('social', 5)
-        },
-        
-        // Opciones exclusivas
-        opciones: {
-            opcion1: document.getElementById('opcion1').value,
-            opcion2: document.getElementById('opcion2').value,
-            opcion3: document.getElementById('opcion3').value,
-            opcion4: document.getElementById('opcion4').value
-        },
-        
-        // Inventario vacío (se llenará después)
-        inventario: []
-    };
-    
-    // Guardar en localStorage
-    localStorage.setItem('personajeData', JSON.stringify(personajeData));
-    
-    // Mostrar mensaje y redirigir
-    alert('* Solicitud enviada. Los guardianes la revisarán.');
-    window.location.href = 'menu.html';
-}
-
-// Función auxiliar para obtener valores de las barras
-function obtenerValorBarra(seccion, index) {
-    // Aquí debes obtener el valor de la barra según cómo las implementaste
-    // Por ahora retorna valores de ejemplo
-    return 3; // Temporal - cámbialo después
-}
