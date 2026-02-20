@@ -21,19 +21,22 @@
             background: #000000;
             font-family: 'Press Start 2P', monospace;
             color: #ffffff;
-            padding: 20px;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
             position: relative;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
-        .fondo-estrellas {
+        /* Estrellas de fondo */
+        .estrellas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #0a0a1a;
             z-index: 0;
         }
 
@@ -41,74 +44,61 @@
             position: absolute;
             width: 2px;
             height: 2px;
-            background: white;
-            animation: parpadear 2s infinite alternate;
+            background: #ffffff;
+            opacity: 0;
+            animation: parpadear 3s infinite;
         }
 
         @keyframes parpadear {
-            from { opacity: 0.2; }
-            to { opacity: 1; }
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
         }
 
-        .particula-color {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: flotarColor 8s linear infinite;
-            z-index: 1;
-        }
-
-        @keyframes flotarColor {
-            0% { transform: translateY(0) translateX(0); opacity: 0.8; }
-            100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
-        }
-
-        .contenedor {
+        .caja-undertale {
             position: relative;
             z-index: 10;
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 1100px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 3px solid #ffffff;
             background: #000000;
-            border: 6px solid #ffffff;
-            box-shadow: 0 0 0 6px #000000, 0 0 0 12px #7f7f7f;
             padding: 30px;
-            animation: aparecer 0.5s steps(10) forwards;
         }
 
-        @keyframes aparecer {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        .caja-undertale::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .caja-undertale::-webkit-scrollbar-track {
+            background: #000000;
+            border: 1px solid #ffffff;
+        }
+
+        .caja-undertale::-webkit-scrollbar-thumb {
+            background: #ffffff;
         }
 
         h1 {
-            text-align: center;
-            color: #ffff00;
             font-size: 2rem;
             margin-bottom: 20px;
-            text-shadow: 4px 4px 0 #ff0000;
+            text-align: center;
+            color: #ffffff;
         }
 
         .linea {
-            height: 4px;
-            background: linear-gradient(90deg, transparent, #ffffff, #ffff00, #ffffff, transparent);
-            margin: 20px 0;
-            animation: moverLinea 3s infinite;
+            width: 100%;
+            height: 3px;
+            background: #ffffff;
+            margin: 20px 0 30px;
         }
 
-        @keyframes moverLinea {
-            0% { background-position: -200px; }
-            100% { background-position: 200px; }
-        }
-
-        /* Info superior: personaje y cristales */
+        /* INFO SUPERIOR */
         .info-superior {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #1a1a2a;
-            border: 4px solid #7f7f7f;
+            border: 2px solid #ffffff;
             padding: 20px;
             margin-bottom: 30px;
         }
@@ -118,148 +108,7 @@
             gap: 30px;
         }
 
-        .personaje-info div {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .personaje-info .label {
-            color: #7f7f7f;
-            font-size: 0.6rem;
-        }
-
-        .personaje-info .valor {
-            color: #00ff00;
-            font-size: 0.9rem;
-        }
-
-        .cristales {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .cristales .label {
-            color: #ffff00;
-            font-size: 0.8rem;
-        }
-
-        .cristales .valor {
-            color: #00ff00;
-            font-size: 1.2rem;
-        }
-
-        /* Filtros */
-        .filtros {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .filtro {
-            flex: 1;
-            min-width: 150px;
-            background: #1a1a2a;
-            border: 4px solid #7f7f7f;
-            color: white;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 0.7rem;
-            padding: 12px;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .filtro.activo {
-            background: #2a2a3a;
-            border-color: #ffff00;
-            color: #ffff00;
-        }
-
-        .filtro:hover {
-            border-color: #ffff00;
-        }
-
-        /* Grid de trabajos */
-        .trabajos-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .trabajo-card {
-            background: #1a1a2a;
-            border: 4px solid #7f7f7f;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.05s step-end;
-            position: relative;
-        }
-
-        .trabajo-card:hover {
-            border-color: #ffff00;
-            transform: translate(-2px, -2px);
-            box-shadow: 8px 8px 0 #2a2a3a;
-        }
-
-        .trabajo-card:active {
-            transform: translate(4px, 4px);
-            box-shadow: 4px 4px 0 #2a2a3a;
-        }
-
-        .trabajo-card.completado {
-            opacity: 0.6;
-            filter: grayscale(80%);
-            cursor: default;
-        }
-
-        .trabajo-card.completado:hover {
-            border-color: #7f7f7f;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .trabajo-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #7f7f7f;
-            padding-bottom: 10px;
-        }
-
-        .trabajo-titulo {
-            color: #ffff00;
-            font-size: 1rem;
-        }
-
-        .trabajo-dificultad {
-            display: flex;
-            gap: 3px;
-        }
-
-        .estrella {
-            color: #7f7f7f;
-            font-size: 0.8rem;
-        }
-
-        .estrella.activa {
-            color: #ffff00;
-        }
-
-        .trabajo-info {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
         .info-item {
-            background: #0a0a1a;
-            border: 2px solid #7f7f7f;
-            padding: 8px;
             text-align: center;
         }
 
@@ -269,75 +118,217 @@
             margin-bottom: 5px;
         }
 
-        .info-item .value {
-            color: #00ff00;
+        .info-item .valor {
+            color: #ffff66;
+            font-size: 0.8rem;
+        }
+
+        .cristales {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cristales .label {
+            color: #7f7f7f;
             font-size: 0.7rem;
         }
 
-        .trabajo-recompensa {
-            background: #0a0a1a;
-            border: 3px solid #ffff00;
-            padding: 10px;
+        .cristales .valor {
+            color: #ffff66;
+            font-size: 1.2rem;
+        }
+
+        /* FILTROS */
+        .filtros {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filtro-btn {
+            flex: 1;
+            min-width: 120px;
+            background: #000000;
+            border: 2px solid #ffffff;
+            color: #ffffff;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.6rem;
+            padding: 12px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .filtro-btn:hover {
+            border-color: #ffff66;
+            color: #ffff66;
+        }
+
+        .filtro-btn.activo {
+            background: #ffff66;
+            color: #000000;
+            border-color: #ffff66;
+        }
+
+        /* TABLAS DE TRABAJOS */
+        .seccion-trabajos {
+            margin-bottom: 40px;
+        }
+
+        .seccion-titulo {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ffffff;
+            padding-bottom: 10px;
+        }
+
+        .seccion-titulo h2 {
+            color: #ffff66;
+            font-size: 1rem;
+        }
+
+        .seccion-titulo span {
+            color: #7f7f7f;
+            font-size: 0.6rem;
+        }
+
+        /* GRID DE TRABAJOS */
+        .trabajos-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .trabajo-card {
+            border: 2px solid #ffffff;
+            background: #0a0a0a;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.1s;
+            position: relative;
+        }
+
+        .trabajo-card:hover {
+            border-color: #ffff66;
+            transform: translate(-2px, -2px);
+        }
+
+        .trabajo-card.completado {
+            opacity: 0.5;
+            filter: grayscale(80%);
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .trabajo-card.completado::after {
+            content: "✓";
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            color: #55ff55;
+            font-size: 1.5rem;
+        }
+
+        .trabajo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #444444;
+            padding-bottom: 10px;
+        }
+
+        .trabajo-titulo {
+            color: #ffff66;
+            font-size: 0.8rem;
+        }
+
+        .trabajo-dificultad {
+            display: flex;
+            gap: 3px;
+        }
+
+        .estrella {
+            width: 16px;
+            height: 16px;
+            background: #7f7f7f;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        .estrella.activa {
+            background: #ffff66;
+        }
+
+        .trabajo-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-celda {
+            border: 1px solid #444444;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .info-celda .label {
+            color: #7f7f7f;
+            font-size: 0.45rem;
+            margin-bottom: 5px;
+        }
+
+        .info-celda .value {
+            color: #ffffff;
+            font-size: 0.6rem;
+        }
+
+        .trabajo-recompensa {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px solid #444444;
+            padding-top: 15px;
+            margin-top: 10px;
         }
 
         .recompensa-dinero {
-            color: #ffff00;
-            font-size: 0.9rem;
+            color: #ffff66;
+            font-size: 0.8rem;
         }
 
         .recompensa-objeto {
-            color: #00ff00;
-            font-size: 0.7rem;
+            color: #55ff55;
+            font-size: 0.6rem;
         }
 
         .btn-aceptar {
             width: 100%;
             margin-top: 15px;
-            padding: 15px;
-            background: #003300;
-            border: 4px solid #00ff00;
-            color: white;
+            padding: 12px;
+            background: #000000;
+            border: 2px solid #55ff55;
+            color: #55ff55;
             font-family: 'Press Start 2P', monospace;
-            font-size: 0.8rem;
+            font-size: 0.6rem;
             cursor: pointer;
         }
 
         .btn-aceptar:hover {
-            background: #004400;
+            background: #0a0a0a;
             transform: translate(-2px, -2px);
-            box-shadow: 5px 5px 0 #00ff00;
         }
 
-        .btn-aceptar:active {
-            transform: translate(4px, 4px);
-            box-shadow: none;
-        }
-
-        .btn-aceptar.completado {
-            background: #330000;
-            border-color: #ff0000;
+        .btn-aceptar:disabled {
+            border-color: #7f7f7f;
+            color: #7f7f7f;
             cursor: not-allowed;
         }
 
-        /* Sección de trabajos activos */
-        .activos-section {
-            margin-top: 40px;
-            background: #1a1a2a;
-            border: 4px solid #7f7f7f;
-            padding: 20px;
-        }
-
-        .activos-header {
-            color: #ffff00;
-            font-size: 1rem;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #7f7f7f;
-            padding-bottom: 10px;
-        }
-
+        /* TRABAJOS ACTIVOS */
         .activos-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -345,28 +336,28 @@
         }
 
         .activo-card {
-            background: #0a0a1a;
-            border: 3px solid #7f7f7f;
+            border: 2px solid #ffff66;
+            background: #0a0a0a;
             padding: 15px;
         }
 
         .activo-titulo {
-            color: #00ff00;
-            font-size: 0.7rem;
+            color: #ffff66;
+            font-size: 0.6rem;
             margin-bottom: 10px;
         }
 
         .activo-progreso {
             margin: 10px 0;
             height: 20px;
-            background: #1a1a2a;
-            border: 2px solid #7f7f7f;
-            overflow: hidden;
+            border: 2px solid #ffffff;
+            background: #000000;
+            position: relative;
         }
 
         .progreso-barra {
             height: 100%;
-            background: #00ff00;
+            background: #55ff55;
             width: 0%;
             transition: width 0.3s;
         }
@@ -379,7 +370,19 @@
             margin-top: 10px;
         }
 
-        /* Modal de detalle */
+        .btn-entregar {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            background: #000000;
+            border: 2px solid #55ff55;
+            color: #55ff55;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            cursor: pointer;
+        }
+
+        /* MODAL DE DETALLE */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -387,7 +390,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.95);
-            z-index: 1000;
+            z-index: 2000;
             display: none;
             justify-content: center;
             align-items: center;
@@ -395,53 +398,72 @@
 
         .modal-content {
             background: #000000;
-            border: 6px solid #ffff00;
-            padding: 40px;
+            border: 3px solid #ffff66;
+            padding: 30px;
             max-width: 600px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
         }
 
-        .modal-content h2 {
-            color: #ffff00;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
+        .modal-titulo {
+            color: #ffff66;
+            font-size: 1.2rem;
             text-align: center;
+            margin-bottom: 20px;
         }
 
         .modal-descripcion {
-            color: white;
-            font-size: 0.8rem;
-            line-height: 1.8;
-            margin-bottom: 30px;
+            border: 2px solid #444444;
             padding: 20px;
-            background: #1a1a2a;
-            border: 3px solid #7f7f7f;
+            color: #ffffff;
+            font-size: 0.7rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
         }
 
         .modal-detalles {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
-        .modal-info {
-            background: #1a1a2a;
-            border: 3px solid #7f7f7f;
-            padding: 15px;
+        .modal-detalle-item {
+            border: 1px solid #444444;
+            padding: 12px;
+            text-align: center;
         }
 
-        .modal-info .label {
+        .modal-detalle-item .label {
             color: #7f7f7f;
-            font-size: 0.6rem;
-            margin-bottom: 5px;
+            font-size: 0.5rem;
+            margin-bottom: 8px;
         }
 
-        .modal-info .value {
-            color: #00ff00;
-            font-size: 0.9rem;
+        .modal-detalle-item .value {
+            color: #ffff66;
+            font-size: 0.8rem;
+        }
+
+        .modal-recompensas {
+            border: 2px solid #444444;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .modal-recompensas h3 {
+            color: #ffff66;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+        }
+
+        .modal-recompensa {
+            display: flex;
+            justify-content: space-between;
+            color: #ffffff;
+            font-size: 0.7rem;
+            margin: 10px 0;
         }
 
         .modal-botones {
@@ -452,474 +474,458 @@
         .modal-btn {
             flex: 1;
             padding: 15px;
+            background: #000000;
+            border: 2px solid #ffffff;
+            color: white;
             font-family: 'Press Start 2P', monospace;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             cursor: pointer;
-            border: 4px solid;
+        }
+
+        .modal-btn:hover {
+            border-color: #ffff66;
+            color: #ffff66;
         }
 
         .modal-btn.aceptar {
-            background: #003300;
-            border-color: #00ff00;
-            color: white;
+            border-color: #55ff55;
+            color: #55ff55;
         }
 
         .modal-btn.aceptar:hover {
-            background: #004400;
+            background: #0a0a0a;
         }
 
-        .modal-btn.cerrar {
-            background: #1a1a2a;
-            border-color: #7f7f7f;
-            color: white;
-        }
-
-        .modal-btn.cerrar:hover {
-            border-color: #ffff00;
-            color: #ffff00;
-        }
-
-        /* Botón volver */
+        /* BOTÓN VOLVER */
         .btn-volver {
-            display: block;
-            width: 200px;
-            margin: 40px auto 10px;
-            padding: 15px;
-            background: #1a1a2a;
-            border: 4px solid #7f7f7f;
+            background: #000000;
+            border: 2px solid #ffffff;
             color: white;
             font-family: 'Press Start 2P', monospace;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
+            padding: 15px 30px;
             cursor: pointer;
-            text-align: center;
-            box-shadow: 8px 8px 0 #0a0a1a;
-            transition: all 0.05s step-end;
+            width: 100%;
+            margin-top: 30px;
         }
 
         .btn-volver:hover {
-            border-color: #ffff00;
-            color: #ffff00;
-            transform: translate(-2px, -2px);
-            box-shadow: 10px 10px 0 #0a0a1a;
-        }
-
-        .btn-volver:active {
-            transform: translate(4px, 4px);
-            box-shadow: 4px 4px 0 #0a0a1a;
+            border-color: #ffff66;
+            color: #ffff66;
         }
 
         @media (max-width: 800px) {
             .trabajos-grid { grid-template-columns: 1fr; }
             .activos-grid { grid-template-columns: 1fr; }
             .modal-detalles { grid-template-columns: 1fr; }
+            .personaje-info { flex-wrap: wrap; }
         }
     </style>
 </head>
 <body>
-    <div class="fondo-estrellas" id="fondo"></div>
-    <div id="particulas"></div>
+    <div class="estrellas" id="estrellas"></div>
 
-    <div class="contenedor">
+    <div class="caja-undertale">
         <h1>TRABAJOS Y MISIONES</h1>
         <div class="linea"></div>
 
-        <!-- Info superior -->
+        <!-- INFO SUPERIOR -->
         <div class="info-superior">
             <div class="personaje-info">
-                <div>
-                    <span class="label">PERSONAJE</span>
-                    <span class="valor" id="nombre-personaje">KAELEN FENRIR</span>
+                <div class="info-item">
+                    <div class="label">PERSONAJE</div>
+                    <div class="valor" id="nombre-personaje">KAELEN</div>
                 </div>
-                <div>
-                    <span class="label">RANGO</span>
-                    <span class="valor" id="rango-personaje">RANGO IV</span>
+                <div class="info-item">
+                    <div class="label">RANGO</div>
+                    <div class="valor" id="rango-personaje">RANGO IV</div>
                 </div>
-                <div>
-                    <span class="label">REINO</span>
-                    <span class="valor" id="reino-personaje">ASTRALITH-VANDERMERE</span>
+                <div class="info-item">
+                    <div class="label">REINO</div>
+                    <div class="valor" id="reino-personaje">KAIDOM</div>
                 </div>
             </div>
             <div class="cristales">
                 <span class="label">CRISTALES:</span>
-                <span class="valor" id="cristales">2,450 💎</span>
+                <span class="valor" id="cristales">2450</span>
             </div>
         </div>
 
-        <!-- Filtros -->
+        <!-- FILTROS -->
         <div class="filtros">
-            <div class="filtro activo" onclick="filtrarTrabajos('todos')">TODOS</div>
-            <div class="filtro" onclick="filtrarTrabajos('combate')">COMBATE</div>
-            <div class="filtro" onclick="filtrarTrabajos('recoleccion')">RECOLECCIÓN</div>
-            <div class="filtro" onclick="filtrarTrabajos('entrega')">ENTREGA</div>
-            <div class="filtro" onclick="filtrarTrabajos('investigacion')">INVESTIGACIÓN</div>
+            <button class="filtro-btn activo" onclick="filtrarTrabajos('todos')">TODOS</button>
+            <button class="filtro-btn" onclick="filtrarTrabajos('combate')">COMBATE</button>
+            <button class="filtro-btn" onclick="filtrarTrabajos('recoleccion')">RECOLECCIÓN</button>
+            <button class="filtro-btn" onclick="filtrarTrabajos('entrega')">ENTREGA</button>
+            <button class="filtro-btn" onclick="filtrarTrabajos('investigacion')">INVESTIGACIÓN</button>
         </div>
 
-        <!-- Grid de trabajos disponibles -->
-        <div class="trabajos-grid" id="trabajos-grid"></div>
-
-        <!-- Sección de trabajos activos -->
-        <div class="activos-section">
-            <div class="activos-header">TRABAJOS ACTIVOS</div>
-            <div class="activos-grid" id="activos-grid"></div>
-        </div>
-
-        <!-- Modal de detalle -->
-        <div class="modal-overlay" id="modal">
-            <div class="modal-content">
-                <h2 id="modal-titulo">Cazar lobos sombríos</h2>
-                <div class="modal-descripcion" id="modal-descripcion">
-                    Derrota 5 lobos en el Bosque de Thanatror.
-                </div>
-                <div class="modal-detalles" id="modal-detalles">
-                    <div class="modal-info">
-                        <div class="label">TIPO</div>
-                        <div class="value" id="modal-tipo">Combate</div>
-                    </div>
-                    <div class="modal-info">
-                        <div class="label">REINO</div>
-                        <div class="value" id="modal-reino">Thanatror</div>
-                    </div>
-                    <div class="modal-info">
-                        <div class="label">DURACIÓN</div>
-                        <div class="value" id="modal-duracion">3 días</div>
-                    </div>
-                    <div class="modal-info">
-                        <div class="label">DIFICULTAD</div>
-                        <div class="value" id="modal-dificultad">★★★☆☆</div>
-                    </div>
-                    <div class="modal-info">
-                        <div class="label">RECOMPENSA</div>
-                        <div class="value" id="modal-dinero">500 💎</div>
-                    </div>
-                    <div class="modal-info">
-                        <div class="label">OBJETO</div>
-                        <div class="value" id="modal-objeto">Colmillo de lobo</div>
-                    </div>
-                </div>
-                <div class="modal-botones">
-                    <button class="modal-btn aceptar" id="modal-aceptar" onclick="aceptarTrabajo()">ACEPTAR TRABAJO</button>
-                    <button class="modal-btn cerrar" onclick="cerrarModal()">CERRAR</button>
-                </div>
+        <!-- TRABAJOS DISPONIBLES -->
+        <div class="seccion-trabajos">
+            <div class="seccion-titulo">
+                <h2>TRABAJOS DISPONIBLES</h2>
+                <span id="disponibles-count">0</span>
             </div>
+            <div class="trabajos-grid" id="trabajos-disponibles"></div>
         </div>
 
-        <!-- Botón volver -->
+        <!-- TRABAJOS ACTIVOS -->
+        <div class="seccion-trabajos">
+            <div class="seccion-titulo">
+                <h2>TRABAJOS ACTIVOS</h2>
+                <span id="activos-count">0/3</span>
+            </div>
+            <div class="activos-grid" id="trabajos-activos"></div>
+        </div>
+
+        <!-- TRABAJOS COMPLETADOS -->
+        <div class="seccion-trabajos">
+            <div class="seccion-titulo">
+                <h2>COMPLETADOS</h2>
+                <span id="completados-count">0</span>
+            </div>
+            <div class="trabajos-grid" id="trabajos-completados"></div>
+        </div>
+
+        <!-- BOTÓN VOLVER -->
         <button class="btn-volver" onclick="window.location.href='menu-desbloqueado.html'">
             VOLVER AL MENÚ
         </button>
     </div>
 
+    <!-- MODAL DE DETALLE -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <div class="modal-titulo" id="modal-titulo"></div>
+            <div class="modal-descripcion" id="modal-descripcion"></div>
+            
+            <div class="modal-detalles" id="modal-detalles"></div>
+            
+            <div class="modal-recompensas" id="modal-recompensas"></div>
+            
+            <div class="modal-botones">
+                <button class="modal-btn aceptar" id="modal-aceptar">ACEPTAR TRABAJO</button>
+                <button class="modal-btn" onclick="cerrarModal()">CERRAR</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Generar estrellas
-        const fondo = document.getElementById('fondo');
+        // GENERAR ESTRELLAS
         for (let i = 0; i < 150; i++) {
             const estrella = document.createElement('div');
             estrella.className = 'estrella';
             estrella.style.left = Math.random() * 100 + '%';
             estrella.style.top = Math.random() * 100 + '%';
             estrella.style.animationDelay = Math.random() * 3 + 's';
-            fondo.appendChild(estrella);
+            document.getElementById('estrellas').appendChild(estrella);
         }
 
-        // Generar partículas arcoíris
-        const particulas = document.getElementById('particulas');
-        const colores = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff', '#ff00ff'];
-        
-        for (let i = 0; i < 50; i++) {
-            const p = document.createElement('div');
-            p.className = 'particula-color';
-            p.style.left = Math.random() * 100 + '%';
-            p.style.top = Math.random() * 100 + '%';
-            p.style.background = colores[Math.floor(Math.random() * colores.length)];
-            p.style.animationDelay = Math.random() * 5 + 's';
-            p.style.animationDuration = (5 + Math.random() * 10) + 's';
-            particulas.appendChild(p);
-        }
-
-        // Datos del personaje (simulados)
-        const personajeData = {
-            nombre: 'KAELEN FENRIR',
+        // ===== DATOS DEL PERSONAJE =====
+        const personaje = {
+            nombre: 'KAELEN',
             rango: 'RANGO IV',
-            reino: 'ASTRALITH-VANDERMERE',
+            reino: 'KAIDOM',
             cristales: 2450
         };
 
-        // Actualizar info del personaje
-        document.getElementById('nombre-personaje').textContent = personajeData.nombre;
-        document.getElementById('rango-personaje').textContent = personajeData.rango;
-        document.getElementById('reino-personaje').textContent = personajeData.reino;
-        document.getElementById('cristales').textContent = personajeData.cristales.toLocaleString() + ' 💎';
-
-        // Datos de trabajos (simulados)
-        const trabajosData = [
+        // ===== DATOS DE TRABAJOS =====
+        let trabajos = [
             {
                 id: 1,
-                titulo: 'Cazar lobos sombríos',
-                descripcion: 'Derrota 5 lobos en el Bosque de Thanatror. Los lobos sombríos son criaturas nocturnas que acechan en la oscuridad.',
+                titulo: 'CAZAR LOBOS SOMBRÍOS',
+                descripcion: 'Derrota 5 lobos en el Bosque de Thanatror. Los lobos sombríos son criaturas nocturnas que acechan en la oscuridad. Ten cuidado con sus aullidos, atraen a más.',
                 tipo: 'combate',
-                reino: 'Thanatror',
-                duracion: '3 días',
+                reino: 'THANATROR',
+                rangoRequerido: 'RANGO IV',
+                duracion: '3 DÍAS',
                 dificultad: 3,
-                recompensa_dinero: 500,
-                recompensa_objeto: 'Colmillo de lobo',
-                objetivo: 5,
-                progreso: 0,
-                activo: false,
-                completado: false
+                recompensaDinero: 500,
+                recompensaObjeto: 'COLMÍLLO DE LOBO',
+                objetivos: { total: 5, actual: 0 },
+                estado: 'disponible'
             },
             {
                 id: 2,
-                titulo: 'Recolectar plantas de luna',
-                descripcion: 'Reúne 10 plantas de luna en Astralith-Vandermere. Las plantas de luna solo florecen durante la noche.',
+                titulo: 'RECOLECTAR PLANTAS DE LUNA',
+                descripcion: 'Reúne 10 plantas de luna en Astralith-Vandermere. Las plantas de luna solo florecen durante la noche y brillan con luz propia.',
                 tipo: 'recoleccion',
-                reino: 'Astralith-Vandermere',
-                duracion: '1 día',
+                reino: 'ASTRALITH-VANDERMERE',
+                rangoRequerido: 'RANGO III',
+                duracion: '1 DÍA',
                 dificultad: 2,
-                recompensa_dinero: 300,
-                recompensa_objeto: 'Pétalo lunar',
-                objetivo: 10,
-                progreso: 0,
-                activo: false,
-                completado: false
+                recompensaDinero: 300,
+                recompensaObjeto: 'PÉTALO LUNAR',
+                objetivos: { total: 10, actual: 0 },
+                estado: 'disponible'
             },
             {
                 id: 3,
-                titulo: 'Entregar paquete misterioso',
-                descripcion: 'Lleva este paquete a Norum Dominai. El contenido es desconocido, pero el pago es seguro.',
+                titulo: 'ENTREGAR PAQUETE MISTERIOSO',
+                descripcion: 'Lleva este paquete a Norum Dominai. El contenido es desconocido, pero el pago es seguro. El destinatario te espera en la taberna "El Fuego Eterno".',
                 tipo: 'entrega',
-                reino: 'Norum Dominai',
-                duracion: '1 día',
+                reino: 'NORUM DOMINAI',
+                rangoRequerido: 'RANGO II',
+                duracion: '1 DÍA',
                 dificultad: 1,
-                recompensa_dinero: 200,
-                recompensa_objeto: 'Mapa secreto',
-                objetivo: 1,
-                progreso: 0,
-                activo: false,
-                completado: false
+                recompensaDinero: 200,
+                recompensaObjeto: 'MAPA SECRETO',
+                objetivos: { total: 1, actual: 0 },
+                estado: 'disponible'
             },
             {
                 id: 4,
-                titulo: 'Investigar ruidos extraños',
-                descripcion: 'Averigua qué causa los ruidos en las cavernas de Balnath. Los mineros están asustados.',
+                titulo: 'INVESTIGAR RUIDOS EXTRAÑOS',
+                descripcion: 'Averigua qué causa los ruidos en las cavernas de Balnath. Los mineros están asustados y se niegan a trabajar. Podría ser algo peligroso.',
                 tipo: 'investigacion',
-                reino: 'Balnath',
-                duracion: '2 días',
+                reino: 'BALNATH',
+                rangoRequerido: 'RANGO IV',
+                duracion: '2 DÍAS',
                 dificultad: 3,
-                recompensa_dinero: 400,
-                recompensa_objeto: 'Gema luminosa',
-                objetivo: 1,
-                progreso: 0,
-                activo: false,
-                completado: false
+                recompensaDinero: 400,
+                recompensaObjeto: 'GEMA LUMINOSA',
+                objetivos: { total: 3, actual: 0 },
+                estado: 'disponible'
             },
             {
                 id: 5,
-                titulo: 'Pescar en Kaidom',
-                descripcion: 'Atrapa 3 peces mágicos en el Mar de Kaidom. Los peces brillan en la oscuridad.',
+                titulo: 'PESCAR EN KAIDOM',
+                descripcion: 'Atrapa 3 peces mágicos en el Mar de Kaidom. Los peces brillan en la oscuridad y son muy escurridizos. Se dice que solo aparecen en luna llena.',
                 tipo: 'recoleccion',
-                reino: 'Kaidom',
-                duracion: '1 día',
+                reino: 'KAIDOM',
+                rangoRequerido: 'RANGO III',
+                duracion: '1 DÍA',
                 dificultad: 2,
-                recompensa_dinero: 350,
-                recompensa_objeto: 'Escama de sirena',
-                objetivo: 3,
-                progreso: 0,
-                activo: false,
-                completado: false
+                recompensaDinero: 350,
+                recompensaObjeto: 'ESCAMA DE SIRENA',
+                objetivos: { total: 3, actual: 0 },
+                estado: 'disponible'
+            },
+            {
+                id: 6,
+                titulo: 'EXTERMINAR PLAGA',
+                descripcion: 'Hay una plaga de insectos gigantes en las cuevas de Balnath. Los mineros no pueden trabajar. Acaba con ellos.',
+                tipo: 'combate',
+                reino: 'BALNATH',
+                rangoRequerido: 'RANGO IV',
+                duracion: '2 DÍAS',
+                dificultad: 3,
+                recompensaDinero: 450,
+                recompensaObjeto: 'VENENO DE INSECTO',
+                objetivos: { total: 8, actual: 0 },
+                estado: 'activo',
+                progreso: 3
+            },
+            {
+                id: 7,
+                titulo: 'AYUDAR AL ERMITAÑO',
+                descripcion: 'Un ermitaño necesita ayuda para recolectar hierbas medicinales en el bosque.',
+                tipo: 'recoleccion',
+                reino: 'THANATROR',
+                rangoRequerido: 'RANGO II',
+                duracion: '1 DÍA',
+                dificultad: 1,
+                recompensaDinero: 150,
+                recompensaObjeto: 'HIERBAS CURATIVAS',
+                objetivos: { total: 5, actual: 5 },
+                estado: 'completado'
             }
         ];
 
-        let trabajos = [...trabajosData];
-        let trabajoSeleccionado = null;
         let filtroActual = 'todos';
+        let trabajoSeleccionado = null;
 
-        // Renderizar trabajos
+        // ===== ACTUALIZAR INFO DEL PERSONAJE =====
+        document.getElementById('nombre-personaje').textContent = personaje.nombre;
+        document.getElementById('rango-personaje').textContent = personaje.rango;
+        document.getElementById('reino-personaje').textContent = personaje.reino;
+        document.getElementById('cristales').textContent = personaje.cristales;
+
+        // ===== RENDERIZAR TRABAJOS =====
         function renderizarTrabajos() {
-            const grid = document.getElementById('trabajos-grid');
-            grid.innerHTML = '';
+            const disponiblesDiv = document.getElementById('trabajos-disponibles');
+            const activosDiv = document.getElementById('trabajos-activos');
+            const completadosDiv = document.getElementById('trabajos-completados');
+            
+            disponiblesDiv.innerHTML = '';
+            activosDiv.innerHTML = '';
+            completadosDiv.innerHTML = '';
 
-            const trabajosFiltrados = filtroActual === 'todos' 
-                ? trabajos.filter(t => !t.activo && !t.completado)
-                : trabajos.filter(t => t.tipo === filtroActual && !t.activo && !t.completado);
+            let disponiblesCount = 0;
+            let activosCount = 0;
+            let completadosCount = 0;
 
-            trabajosFiltrados.forEach(trabajo => {
+            trabajos.forEach(trabajo => {
+                // Filtrar por tipo si no es 'todos'
+                if (filtroActual !== 'todos' && trabajo.tipo !== filtroActual && trabajo.estado === 'disponible') return;
+
                 const card = document.createElement('div');
-                card.className = 'trabajo-card';
+                card.className = `trabajo-card ${trabajo.estado === 'completado' ? 'completado' : ''}`;
                 
-                // Generar estrellas de dificultad
+                // Estrellas de dificultad
                 let estrellas = '';
                 for (let i = 1; i <= 5; i++) {
-                    estrellas += `<span class="estrella ${i <= trabajo.dificultad ? 'activa' : ''}">★</span>`;
+                    estrellas += `<div class="estrella ${i <= trabajo.dificultad ? 'activa' : ''}"></div>`;
                 }
 
                 card.innerHTML = `
                     <div class="trabajo-header">
-                        <span class="trabajo-titulo">${trabajo.titulo}</span>
+                        <div class="trabajo-titulo">${trabajo.titulo}</div>
                         <div class="trabajo-dificultad">${estrellas}</div>
                     </div>
                     <div class="trabajo-info">
-                        <div class="info-item">
+                        <div class="info-celda">
                             <div class="label">TIPO</div>
                             <div class="value">${trabajo.tipo.toUpperCase()}</div>
                         </div>
-                        <div class="info-item">
+                        <div class="info-celda">
                             <div class="label">REINO</div>
                             <div class="value">${trabajo.reino}</div>
                         </div>
-                        <div class="info-item">
+                        <div class="info-celda">
                             <div class="label">DURACIÓN</div>
                             <div class="value">${trabajo.duracion}</div>
                         </div>
-                        <div class="info-item">
-                            <div class="label">OBJETIVO</div>
-                            <div class="value">${trabajo.objetivo}</div>
+                        <div class="info-celda">
+                            <div class="label">RANGO</div>
+                            <div class="value">${trabajo.rangoRequerido}</div>
                         </div>
                     </div>
                     <div class="trabajo-recompensa">
-                        <span class="recompensa-dinero">${trabajo.recompensa_dinero} 💎</span>
-                        <span class="recompensa-objeto">+ ${trabajo.recompensa_objeto}</span>
+                        <span class="recompensa-dinero">${trabajo.recompensaDinero} 💎</span>
+                        <span class="recompensa-objeto">+ ${trabajo.recompensaObjeto}</span>
                     </div>
                 `;
 
-                card.onclick = () => mostrarDetalle(trabajo);
-                grid.appendChild(card);
-            });
-        }
-
-        // Renderizar trabajos activos
-        function renderizarActivos() {
-            const grid = document.getElementById('activos-grid');
-            grid.innerHTML = '';
-
-            const activos = trabajos.filter(t => t.activo && !t.completado);
-
-            activos.forEach(trabajo => {
-                const card = document.createElement('div');
-                card.className = 'activo-card';
-                
-                const porcentaje = (trabajo.progreso / trabajo.objetivo) * 100;
-
-                card.innerHTML = `
-                    <div class="activo-titulo">${trabajo.titulo}</div>
-                    <div class="activo-progreso">
-                        <div class="progreso-barra" style="width: ${porcentaje}%;"></div>
-                    </div>
-                    <div class="activo-info">
-                        <span>${trabajo.progreso}/${trabajo.objetivo}</span>
-                        <span>${trabajo.recompensa_dinero} 💎</span>
-                    </div>
-                `;
-
-                grid.appendChild(card);
+                if (trabajo.estado === 'disponible') {
+                    disponiblesCount++;
+                    card.onclick = () => mostrarDetalle(trabajo);
+                    disponiblesDiv.appendChild(card);
+                } else if (trabajo.estado === 'activo') {
+                    activosCount++;
+                    const progreso = (trabajo.progreso / trabajo.objetivos.total) * 100;
+                    card.innerHTML += `
+                        <div class="activo-progreso">
+                            <div class="progreso-barra" style="width: ${progreso}%;"></div>
+                        </div>
+                        <div class="activo-info">
+                            <span>${trabajo.progreso}/${trabajo.objetivos.total}</span>
+                            <button class="btn-entregar" onclick="entregarTrabajo(${trabajo.id})">ENTREGAR</button>
+                        </div>
+                    `;
+                    activosDiv.appendChild(card);
+                } else if (trabajo.estado === 'completado') {
+                    completadosCount++;
+                    completadosDiv.appendChild(card);
+                }
             });
 
-            if (activos.length === 0) {
-                grid.innerHTML = '<div style="color: #7f7f7f; text-align: center; padding: 20px;">NO TIENES TRABAJOS ACTIVOS</div>';
-            }
+            document.getElementById('disponibles-count').textContent = disponiblesCount;
+            document.getElementById('activos-count').textContent = `${activosCount}/3`;
+            document.getElementById('completados-count').textContent = completadosCount;
         }
 
-        // Mostrar detalle del trabajo
+        // ===== MOSTRAR DETALLE DEL TRABAJO =====
         function mostrarDetalle(trabajo) {
             trabajoSeleccionado = trabajo;
             
             document.getElementById('modal-titulo').textContent = trabajo.titulo;
             document.getElementById('modal-descripcion').textContent = trabajo.descripcion;
-            document.getElementById('modal-tipo').textContent = trabajo.tipo.toUpperCase();
-            document.getElementById('modal-reino').textContent = trabajo.reino;
-            document.getElementById('modal-duracion').textContent = trabajo.duracion;
             
-            // Estrellas de dificultad
-            let estrellas = '';
-            for (let i = 1; i <= 5; i++) {
-                estrellas += i <= trabajo.dificultad ? '★' : '☆';
-            }
-            document.getElementById('modal-dificultad').textContent = estrellas;
-            
-            document.getElementById('modal-dinero').textContent = trabajo.recompensa_dinero + ' 💎';
-            document.getElementById('modal-objeto').textContent = trabajo.recompensa_objeto;
-            
+            const detallesDiv = document.getElementById('modal-detalles');
+            detallesDiv.innerHTML = `
+                <div class="modal-detalle-item">
+                    <div class="label">TIPO</div>
+                    <div class="value">${trabajo.tipo.toUpperCase()}</div>
+                </div>
+                <div class="modal-detalle-item">
+                    <div class="label">REINO</div>
+                    <div class="value">${trabajo.reino}</div>
+                </div>
+                <div class="modal-detalle-item">
+                    <div class="label">DURACIÓN</div>
+                    <div class="value">${trabajo.duracion}</div>
+                </div>
+                <div class="modal-detalle-item">
+                    <div class="label">RANGO REQ.</div>
+                    <div class="value">${trabajo.rangoRequerido}</div>
+                </div>
+                <div class="modal-detalle-item">
+                    <div class="label">OBJETIVO</div>
+                    <div class="value">${trabajo.objetivos.total}</div>
+                </div>
+                <div class="modal-detalle-item">
+                    <div class="label">DIFICULTAD</div>
+                    <div class="value">${'★'.repeat(trabajo.dificultad)}${'☆'.repeat(5-trabajo.dificultad)}</div>
+                </div>
+            `;
+
+            const recompensasDiv = document.getElementById('modal-recompensas');
+            recompensasDiv.innerHTML = `
+                <h3>RECOMPENSAS</h3>
+                <div class="modal-recompensa">
+                    <span>CRISTALES:</span>
+                    <span>${trabajo.recompensaDinero} 💎</span>
+                </div>
+                <div class="modal-recompensa">
+                    <span>OBJETO:</span>
+                    <span>${trabajo.recompensaObjeto}</span>
+                </div>
+            `;
+
+            document.getElementById('modal-aceptar').onclick = () => aceptarTrabajo(trabajo.id);
             document.getElementById('modal').style.display = 'flex';
         }
 
-        // Cerrar modal
         function cerrarModal() {
             document.getElementById('modal').style.display = 'none';
             trabajoSeleccionado = null;
         }
 
-        // Aceptar trabajo
-        function aceptarTrabajo() {
-            if (!trabajoSeleccionado) return;
-
-            const trabajo = trabajos.find(t => t.id === trabajoSeleccionado.id);
-            if (trabajo) {
-                trabajo.activo = true;
-                trabajo.progreso = 0;
-            }
-
-            renderizarTrabajos();
-            renderizarActivos();
-            cerrarModal();
+        // ===== ACEPTAR TRABAJO =====
+        function aceptarTrabajo(id) {
+            const trabajo = trabajos.find(t => t.id === id);
+            const activos = trabajos.filter(t => t.estado === 'activo').length;
             
-            mostrarMensaje('✓ TRABAJO ACEPTADO ✓', 'exito');
+            if (activos >= 3) {
+                alert('* SOLO PUEDES TENER 3 TRABAJOS ACTIVOS');
+                cerrarModal();
+                return;
+            }
+            
+            trabajo.estado = 'activo';
+            trabajo.progreso = 0;
+            
+            renderizarTrabajos();
+            cerrarModal();
         }
 
-        // Filtrar trabajos
+        // ===== ENTREGAR TRABAJO =====
+        function entregarTrabajo(id) {
+            const trabajo = trabajos.find(t => t.id === id);
+            
+            if (trabajo.progreso < trabajo.objetivos.total) {
+                alert(`* FALTAN ${trabajo.objetivos.total - trabajo.progreso} OBJETIVOS`);
+                return;
+            }
+            
+            trabajo.estado = 'completado';
+            personaje.cristales += trabajo.recompensaDinero;
+            document.getElementById('cristales').textContent = personaje.cristales;
+            
+            renderizarTrabajos();
+        }
+
+        // ===== FILTRAR TRABAJOS =====
         function filtrarTrabajos(tipo) {
             filtroActual = tipo;
-            
-            document.querySelectorAll('.filtro').forEach(f => f.classList.remove('activo'));
+            document.querySelectorAll('.filtro-btn').forEach(btn => btn.classList.remove('activo'));
             event.target.classList.add('activo');
-            
             renderizarTrabajos();
         }
 
-        // Mostrar mensaje
-        function mostrarMensaje(texto, tipo) {
-            const mensaje = document.createElement('div');
-            mensaje.className = 'mensaje ' + tipo;
-            mensaje.textContent = texto;
-            document.body.appendChild(mensaje);
-            setTimeout(() => mensaje.remove(), 3000);
-        }
-
-        // Inicializar
+        // ===== INICIALIZAR =====
         renderizarTrabajos();
-        renderizarActivos();
-
-        // Estilo para mensajes
-        const style = document.createElement('style');
-        style.textContent = `
-            .mensaje {
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                padding: 30px;
-                background: #000000;
-                border-width: 6px;
-                border-style: solid;
-                z-index: 1000;
-                text-align: center;
-                line-height: 2;
-                animation: aparecerMensaje 0.2s steps(5);
-            }
-            .mensaje.error {
-                border-color: #ff0000;
-                background: #330000;
-                color: white;
-            }
-            .mensaje.exito {
-                border-color: #00ff00;
-                background: #003300;
-                color: white;
-            }
-            @keyframes aparecerMensaje {
-                from { transform: translate(-50%, -50%) scale(0); }
-                to { transform: translate(-50%, -50%) scale(1); }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
