@@ -21,19 +21,21 @@
             background: #000000;
             font-family: 'Press Start 2P', monospace;
             color: #ffffff;
-            padding: 20px;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
             position: relative;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
-        .fondo-estrellas {
+        .estrellas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #0a0a1a;
             z-index: 0;
         }
 
@@ -41,82 +43,56 @@
             position: absolute;
             width: 2px;
             height: 2px;
-            background: white;
-            animation: parpadear 2s infinite alternate;
+            background: #ffffff;
+            opacity: 0;
+            animation: parpadear 3s infinite;
         }
 
         @keyframes parpadear {
-            from { opacity: 0.2; }
-            to { opacity: 1; }
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
         }
 
-        .particula-color {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: flotarColor 8s linear infinite;
-            z-index: 1;
-        }
-
-        @keyframes flotarColor {
-            0% { transform: translateY(0) translateX(0); opacity: 0.8; }
-            100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
-        }
-
-        .contenedor {
+        .caja-undertale {
             position: relative;
             z-index: 10;
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 900px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 3px solid #ffffff;
             background: #000000;
-            border: 6px solid #ffffff;
-            box-shadow: 0 0 0 6px #000000, 0 0 0 12px #7f7f7f;
             padding: 30px;
-            animation: aparecer 0.5s steps(10) forwards;
-        }
-
-        @keyframes aparecer {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
         }
 
         h1 {
-            text-align: center;
-            color: #ffff00;
             font-size: 2rem;
             margin-bottom: 20px;
-            text-shadow: 4px 4px 0 #ff0000;
+            text-align: center;
+            color: #ffffff;
         }
 
         .linea {
-            height: 4px;
-            background: linear-gradient(90deg, transparent, #ffffff, #ffff00, #ffffff, transparent);
-            margin: 20px 0;
-            animation: moverLinea 3s infinite;
+            width: 100%;
+            height: 3px;
+            background: #ffffff;
+            margin: 20px 0 30px;
         }
 
-        @keyframes moverLinea {
-            0% { background-position: -200px; }
-            100% { background-position: 200px; }
-        }
-
-        /* Sección superior: imagen y datos básicos */
-        .seccion-superior {
+        /* INFO SUPERIOR */
+        .info-superior {
             display: flex;
             gap: 30px;
             margin-bottom: 30px;
-            background: #1a1a2a;
-            border: 4px solid #7f7f7f;
+            border: 2px solid #ffffff;
             padding: 20px;
         }
 
         .imagen-personaje {
-            width: 200px;
-            height: 200px;
-            background: #0a0a1a;
-            border: 4px solid #7f7f7f;
+            width: 150px;
+            height: 150px;
+            border: 2px solid #ffffff;
+            background: #0a0a0a;
             overflow: hidden;
         }
 
@@ -126,36 +102,33 @@
             object-fit: cover;
         }
 
-        .datos-principales {
+        .datos-basicos {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
         }
 
         .dato-item {
-            background: #0a0a1a;
-            border: 3px solid #7f7f7f;
-            padding: 12px;
+            border: 1px solid #444444;
+            padding: 10px;
         }
 
-        .dato-item .etiqueta {
+        .dato-label {
+            font-size: 0.5rem;
             color: #7f7f7f;
-            font-size: 0.6rem;
-            margin-bottom: 5px;
         }
 
-        .dato-item .valor {
-            color: #00ff00;
-            font-size: 0.8rem;
+        .dato-valor {
+            font-size: 0.7rem;
+            color: #ffffff;
         }
 
-        /* Barras de estadísticas */
+        /* BARRAS */
         .seccion-barras {
-            margin: 30px 0;
+            margin-bottom: 30px;
+            border: 2px solid #ffffff;
             padding: 20px;
-            background: #1a1a2a;
-            border: 4px solid #7f7f7f;
         }
 
         .barras-grid {
@@ -165,329 +138,254 @@
         }
 
         .barra-item {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            margin-bottom: 15px;
         }
 
         .barra-header {
             display: flex;
             justify-content: space-between;
-            color: #ffff00;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
+            color: #ffff66;
+            margin-bottom: 5px;
         }
 
         .barra-contenedor {
             width: 100%;
-            height: 30px;
-            background: #0a0a1a;
-            border: 4px solid #7f7f7f;
-            position: relative;
-            overflow: hidden;
+            height: 20px;
+            border: 2px solid #ffffff;
+            background: #000000;
         }
 
         .barra-llenado {
             height: 100%;
-            width: 0%;
-            position: relative;
-            animation: llenarBarra 1s ease-out forwards;
+            transition: width 0.3s;
         }
 
-        .barra-fuerza { background: #ff4444; }
-        .barra-magia { background: #4444ff; }
-        .barra-esencia { background: #ff44ff; }
-        .barra-vida { background: #44ff44; }
+        .barra-fuerza { background: #ff5555; }
+        .barra-magia { background: #5555ff; }
+        .barra-esencia { background: #ff55ff; }
+        .barra-vida { background: #55ff55; }
 
-        .barra-llenado::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: brilloBarra 2s infinite;
-        }
-
-        @keyframes brilloBarra {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .modificador-info {
-            color: #ffff00;
-            font-size: 0.6rem;
-            margin-top: 2px;
-        }
-
-        /* Secciones de atributos */
+        /* ATRIBUTOS */
         .seccion-atributos {
-            margin: 30px 0;
-            background: #1a1a2a;
-            border: 4px solid #7f7f7f;
+            margin-bottom: 30px;
+            border: 2px solid #ffffff;
             padding: 20px;
         }
 
         .seccion-titulo {
-            color: #ffff00;
             font-size: 1rem;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #7f7f7f;
-            padding-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ffffff;
+            padding-bottom: 8px;
         }
 
-        .grid-atributos {
+        .atributos-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
         }
 
         .atributo-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #0a0a1a;
+            border: 1px solid #444444;
             padding: 10px;
-            border: 3px solid #7f7f7f;
         }
 
-        .atributo-item .nombre {
-            width: 140px;
-            color: white;
-            font-size: 0.7rem;
+        .atributo-nombre {
+            font-size: 0.5rem;
+            color: #7f7f7f;
+            margin-bottom: 5px;
         }
 
-        .circulos {
+        .atributo-puntos {
             display: flex;
-            gap: 4px;
+            gap: 3px;
+            margin: 5px 0;
         }
 
-        .circulo {
-            width: 20px;
-            height: 20px;
-            border: 3px solid #7f7f7f;
-            background: #0a0a1a;
+        .punto {
+            width: 12px;
+            height: 12px;
+            border: 1px solid #ffffff;
+            background: #000000;
         }
 
-        .circulo.activo {
-            background: #00ff00;
-            border-color: #ffff00;
-            animation: latir 1s infinite alternate;
-        }
+        .punto.activo { background: #ffff66; }
+        .punto.inactivo { opacity: 0.3; }
 
-        .circulo.inactivo {
-            background: #1a1a2a;
-            border-color: #3f3f3f;
-            opacity: 0.5;
-        }
-
-        @keyframes latir {
-            from { transform: scale(1); opacity: 0.8; }
-            to { transform: scale(1.1); opacity: 1; }
-        }
-
-        /* Inventario rápido */
+        /* INVENTARIO */
         .seccion-inventario {
-            margin: 30px 0;
+            margin-bottom: 20px;
+            border: 2px solid #ffffff;
             padding: 20px;
-            background: #1a1a2a;
-            border: 4px solid #7f7f7f;
+        }
+
+        .inventario-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .inventario-header h2 {
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+
+        .inventario-header span {
+            color: #ffff66;
+            font-size: 0.7rem;
         }
 
         .inventario-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-top: 15px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
         }
 
-        .item-inventario {
-            background: #0a0a1a;
-            border: 3px solid #7f7f7f;
-            padding: 10px;
+        .objeto-btn {
+            width: 100%;
+            border: 2px solid #ffffff;
+            background: #0a0a0a;
+            padding: 15px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', monospace;
+            color: white;
             text-align: center;
         }
 
-        .item-inventario.equipado {
-            border-color: #ffff00;
-            background: #1a1a2a;
-            box-shadow: 0 0 15px #ffff00;
+        .objeto-btn:hover {
+            border-color: #ffff66;
+            transform: translate(-2px, -2px);
         }
 
-        .item-inventario .icono {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
+        .objeto-btn.equipado {
+            border-color: #ffff66;
+            box-shadow: 0 0 10px #ffff66;
         }
 
-        .item-inventario .nombre {
-            color: #00ff00;
-            font-size: 0.6rem;
-            margin-bottom: 3px;
-        }
-
-        .item-inventario .cantidad {
-            color: #7f7f7f;
+        .vacio-btn {
+            width: 100%;
+            border: 2px dashed #444444;
+            padding: 15px;
+            background: #000000;
+            color: #444444;
             font-size: 0.5rem;
-        }
-
-        .item-vacio {
-            background: #0a0a1a;
-            border: 3px dashed #3f3f3f;
-            padding: 15px;
             text-align: center;
-            color: #3f3f3f;
-            font-size: 0.6rem;
         }
 
-        /* Botón volver */
-        .btn-volver {
-            display: block;
-            width: 200px;
-            margin: 30px auto 10px;
-            padding: 15px;
-            background: #1a1a2a;
-            border: 4px solid #7f7f7f;
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #000000;
+            border: 3px solid #ffffff;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-botones {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            background: #000000;
+            border: 2px solid #ffffff;
             color: white;
             font-family: 'Press Start 2P', monospace;
-            font-size: 0.8rem;
+            font-size: 0.6rem;
+            padding: 12px;
             cursor: pointer;
-            text-align: center;
-            box-shadow: 8px 8px 0 #0a0a1a;
-            transition: all 0.05s step-end;
+        }
+
+        .modal-btn:hover {
+            border-color: #ffff66;
+            color: #ffff66;
+        }
+
+        .btn-volver {
+            background: #000000;
+            border: 2px solid #ffffff;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.9rem;
+            padding: 15px 30px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
         }
 
         .btn-volver:hover {
-            border-color: #ffff00;
-            color: #ffff00;
-            transform: translate(-2px, -2px);
-            box-shadow: 10px 10px 0 #0a0a1a;
-        }
-
-        .btn-volver:active {
-            transform: translate(4px, 4px);
-            box-shadow: 4px 4px 0 #0a0a1a;
-        }
-
-        @media (max-width: 800px) {
-            .seccion-superior { flex-direction: column; }
-            .datos-principales { grid-template-columns: 1fr; }
-            .barras-grid { grid-template-columns: 1fr; }
-            .grid-atributos { grid-template-columns: 1fr; }
-            .inventario-grid { grid-template-columns: repeat(2, 1fr); }
+            border-color: #ffff66;
+            color: #ffff66;
         }
     </style>
 </head>
 <body>
-    <div class="fondo-estrellas" id="fondo"></div>
-    <div id="particulas"></div>
+    <div class="estrellas" id="estrellas"></div>
 
-    <div class="contenedor">
+    <div class="caja-undertale">
         <h1>FICHA DE PERSONAJE</h1>
         <div class="linea"></div>
 
-        <!-- SECCIÓN SUPERIOR: IMAGEN Y DATOS BÁSICOS -->
-        <div class="seccion-superior">
-            <div class="imagen-personaje" id="imagen-personaje">
-                <img src="" id="imagen-personaje-img" style="display: none;">
-            </div>
-            <div class="datos-principales" id="datos-principales">
-                <!-- Se llenará con JavaScript -->
-            </div>
+        <!-- INFO SUPERIOR -->
+        <div class="info-superior">
+            <div class="imagen-personaje" id="imagen-personaje"></div>
+            <div class="datos-basicos" id="datos-basicos"></div>
         </div>
 
-        <!-- BARRAS DE ESTADÍSTICAS -->
+        <!-- BARRAS -->
         <div class="seccion-barras">
-            <div class="barras-grid">
-                <div class="barra-item">
-                    <div class="barra-header">
-                        <span>FUERZA</span>
-                        <span id="valor-fuerza">0</span>
-                    </div>
-                    <div class="barra-contenedor">
-                        <div class="barra-llenado barra-fuerza" id="barra-fuerza" style="width: 0%;"></div>
-                    </div>
-                    <div class="modificador-info" id="mod-fuerza"></div>
-                </div>
-                <div class="barra-item">
-                    <div class="barra-header">
-                        <span>MAGIA</span>
-                        <span id="valor-magia">0</span>
-                    </div>
-                    <div class="barra-contenedor">
-                        <div class="barra-llenado barra-magia" id="barra-magia" style="width: 0%;"></div>
-                    </div>
-                    <div class="modificador-info" id="mod-magia"></div>
-                </div>
-                <div class="barra-item">
-                    <div class="barra-header">
-                        <span>ESENCIA</span>
-                        <span id="valor-esencia">0</span>
-                    </div>
-                    <div class="barra-contenedor">
-                        <div class="barra-llenado barra-esencia" id="barra-esencia" style="width: 0%;"></div>
-                    </div>
-                    <div class="modificador-info" id="mod-esencia"></div>
-                </div>
-                <div class="barra-item">
-                    <div class="barra-header">
-                        <span>VIDA</span>
-                        <span id="valor-vida">0/0</span>
-                    </div>
-                    <div class="barra-contenedor">
-                        <div class="barra-llenado barra-vida" id="barra-vida" style="width: 0%;"></div>
-                    </div>
-                    <div class="modificador-info" id="mod-vida"></div>
-                </div>
-            </div>
+            <div class="barras-grid" id="barras-container"></div>
         </div>
 
         <!-- HABILIDADES -->
         <div class="seccion-atributos">
-            <div class="seccion-titulo">
-                <span>HABILIDADES</span>
-                <span class="contador" id="total-habilidades">25/25</span>
-            </div>
-            <div class="grid-atributos" id="grid-habilidades"></div>
+            <div class="seccion-titulo">HABILIDADES</div>
+            <div class="atributos-grid" id="habilidades-container"></div>
         </div>
 
         <!-- CUERPO -->
         <div class="seccion-atributos">
-            <div class="seccion-titulo">
-                <span>CUERPO</span>
-                <span class="contador" id="total-cuerpo">12/12</span>
-            </div>
-            <div class="grid-atributos" id="grid-cuerpo"></div>
+            <div class="seccion-titulo">CUERPO</div>
+            <div class="atributos-grid" id="cuerpo-container"></div>
         </div>
 
         <!-- MENTE -->
         <div class="seccion-atributos">
-            <div class="seccion-titulo">
-                <span>MENTE</span>
-                <span class="contador" id="total-mente">9/9</span>
-            </div>
-            <div class="grid-atributos" id="grid-mente"></div>
+            <div class="seccion-titulo">MENTE</div>
+            <div class="atributos-grid" id="mente-container"></div>
         </div>
 
         <!-- SOCIAL -->
         <div class="seccion-atributos">
-            <div class="seccion-titulo">
-                <span>SOCIAL</span>
-                <span class="contador" id="total-social">14/14</span>
-            </div>
-            <div class="grid-atributos" id="grid-social"></div>
+            <div class="seccion-titulo">SOCIAL</div>
+            <div class="atributos-grid" id="social-container"></div>
         </div>
 
-        <!-- INVENTARIO RÁPIDO -->
+        <!-- INVENTARIO -->
         <div class="seccion-inventario">
-            <div class="seccion-titulo">
-                <span>INVENTARIO</span>
-                <span>5 MÁS RECIENTES</span>
+            <div class="inventario-header">
+                <h2>INVENTARIO</h2>
+                <span id="equipados-count">0/3</span>
             </div>
-            <div class="inventario-grid" id="inventario-grid">
-                <!-- Se llenará con JavaScript -->
-            </div>
+            
+            <div id="inventario-container"></div>
         </div>
 
         <!-- BOTÓN VOLVER -->
@@ -496,202 +394,212 @@
         </button>
     </div>
 
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal" style="display: none;">
+        <div class="modal-content">
+            <p id="modal-texto"></p>
+            <div class="modal-botones" id="modal-botones"></div>
+        </div>
+    </div>
+
     <script>
-        // Generar estrellas
-        const fondo = document.getElementById('fondo');
+        // GENERAR ESTRELLAS
         for (let i = 0; i < 150; i++) {
             const estrella = document.createElement('div');
             estrella.className = 'estrella';
             estrella.style.left = Math.random() * 100 + '%';
             estrella.style.top = Math.random() * 100 + '%';
             estrella.style.animationDelay = Math.random() * 3 + 's';
-            fondo.appendChild(estrella);
+            document.getElementById('estrellas').appendChild(estrella);
         }
 
-        // Generar partículas arcoíris
-        const particulas = document.getElementById('particulas');
-        const colores = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff', '#ff00ff'];
-        
-        for (let i = 0; i < 50; i++) {
-            const p = document.createElement('div');
-            p.className = 'particula-color';
-            p.style.left = Math.random() * 100 + '%';
-            p.style.top = Math.random() * 100 + '%';
-            p.style.background = colores[Math.floor(Math.random() * colores.length)];
-            p.style.animationDelay = Math.random() * 5 + 's';
-            p.style.animationDuration = (5 + Math.random() * 10) + 's';
-            particulas.appendChild(p);
-        }
+        // ===== CARGAR DATOS DEL FORMULARIO =====
+        let personaje = null;
 
-        // Datos del personaje (simulados - después vendrán de Supabase)
-        const personajeData = {
-            nombre: 'KAELEN FENRIR',
-            raza: 'EL FÉNIX',
-            rango: 'RANGO IV: ÉLITE/PROTECTOR',
-            edad: 245,
-            genero: 'MASCULINO',
-            altura: '1.85m',
-            imagen: null,
-            dinero: 2450,
-            fuerza: 145,
-            magia: 180,
-            esencia: 165,
-            vida: 220,
-            vidaMax: 220,
-            habilidades: {
-                'PERSUASIÓN': 4,
-                'COMUNICACIÓN': 5,
-                'PERCEPCIÓN': 3,
-                'MEDITACIÓN': 4,
-                'ALFABETISMO': 2,
-                'CREATIVIDAD': 3,
-                'TECNOLOGÍA': 1,
-                'COMBATE': 5,
-                'SUPERVIVENCIA': 3,
-                'COQUETA': 0,
-                'SEDUCCIÓN': 0,
-                'SUERTE': 2
-            },
-            cuerpo: {
-                'DESTREZA': 4,
-                'SALUD': 5,
-                'ENERGÍA': 3,
-                'BELLEZA': 2,
-                'ESTILO': 3
-            },
-            mente: {
-                'INTELIGENCIA': 5,
-                'FELICIDAD': 3,
-                'ESPIRITUALIDAD': 4,
-                'CONFIANZA': 3
-            },
-            social: {
-                'CARISMA': 4,
-                'EMPATÍA': 3,
-                'AGRESIVIDAD': 2,
-                'GENEROSIDAD': 3,
-                'RIQUEZA': 1,
-                'LIBIDO': 2
-            },
-            inventario: [
-                { nombre: 'Néctar de Yggdrasil', cantidad: 3, equipado: false, icono: '🧪' },
-                { nombre: 'Espada de Hierro', cantidad: 1, equipado: true, icono: '⚔️' },
-                { nombre: 'Poción de Vida', cantidad: 5, equipado: false, icono: '🧴' },
-                { nombre: 'Daga de Basilisco', cantidad: 1, equipado: false, icono: '🗡️' },
-                { nombre: 'Mapa del Reino', cantidad: 1, equipado: false, icono: '🗺️' }
-            ]
-        };
-
-        // Mostrar datos básicos
-        function mostrarDatosBasicos() {
-            const contenedor = document.getElementById('datos-principales');
-            const campos = [
-                { etiqueta: 'NOMBRE', valor: personajeData.nombre },
-                { etiqueta: 'RAZA', valor: personajeData.raza },
-                { etiqueta: 'RANGO', valor: personajeData.rango },
-                { etiqueta: 'EDAD', valor: personajeData.edad + ' años' },
-                { etiqueta: 'GÉNERO', valor: personajeData.genero },
-                { etiqueta: 'ALTURA', valor: personajeData.altura }
-            ];
-
-            campos.forEach(campo => {
-                const div = document.createElement('div');
-                div.className = 'dato-item';
-                div.innerHTML = `
-                    <div class="etiqueta">${campo.etiqueta}</div>
-                    <div class="valor">${campo.valor}</div>
-                `;
-                contenedor.appendChild(div);
-            });
-
-            if (personajeData.imagen) {
-                const img = document.getElementById('imagen-personaje-img');
-                img.src = personajeData.imagen;
-                img.style.display = 'block';
+        function cargarPersonaje() {
+            const guardado = localStorage.getItem('personajeData');
+            
+            if (guardado) {
+                personaje = JSON.parse(guardado);
+            } else {
+                // Datos de ejemplo si no hay guardado
+                personaje = {
+                    nombre: 'KAELEN',
+                    raza: 'EL FÉNIX',
+                    rango: 'RANGO IV: ÉLITE/PROTECTOR',
+                    edad: '245',
+                    genero: 'MASCULINO',
+                    altura: '1.85m',
+                    imagen: null,
+                    stats: { fuerza: 145, magia: 180, esencia: 165, vida: 220, vidaMax: 220 },
+                    habilidades: {
+                        'PERSUASIÓN': 4, 'COMUNICACIÓN': 5, 'PERCEPCIÓN': 3, 'MEDITACIÓN': 4,
+                        'ALFABETISMO': 2, 'CREATIVIDAD': 3, 'TECNOLOGÍA': 1, 'COMBATE': 5,
+                        'SUPERVIVENCIA': 3, 'COQUETA': 0, 'SEDUCCIÓN': 0, 'SUERTE': 2
+                    },
+                    cuerpo: { 'DESTREZA': 4, 'SALUD': 5, 'ENERGÍA': 3, 'BELLEZA': 2, 'ESTILO': 3 },
+                    mente: { 'INTELIGENCIA': 5, 'FELICIDAD': 3, 'ESPIRITUALIDAD': 4, 'CONFIANZA': 3 },
+                    social: { 'CARISMA': 4, 'EMPATÍA': 3, 'AGRESIVIDAD': 2, 'GENEROSIDAD': 3, 'RIQUEZA': 1, 'LIBIDO': 2 },
+                    inventario: [
+                        { id: 1, nombre: 'NECTAR YGGDRASIL', tipo: 'consumible', cantidad: 3, equipado: false },
+                        { id: 2, nombre: 'ESPADA HIERRO', tipo: 'equipo', cantidad: 1, equipado: true },
+                        { id: 3, nombre: 'POCIÓN VIDA', tipo: 'consumible', cantidad: 5, equipado: false }
+                    ]
+                };
             }
+
+            // Mostrar imagen si existe
+            if (personaje.imagen) {
+                document.getElementById('imagen-personaje').innerHTML = `<img src="${personaje.imagen}">`;
+            }
+
+            // Mostrar datos básicos
+            document.getElementById('datos-basicos').innerHTML = `
+                <div class="dato-item"><div class="dato-label">NOMBRE</div><div class="dato-valor">${personaje.nombre}</div></div>
+                <div class="dato-item"><div class="dato-label">RAZA</div><div class="dato-valor">${personaje.raza}</div></div>
+                <div class="dato-item"><div class="dato-label">RANGO</div><div class="dato-valor">${personaje.rango}</div></div>
+                <div class="dato-item"><div class="dato-label">EDAD</div><div class="dato-valor">${personaje.edad}</div></div>
+                <div class="dato-item"><div class="dato-label">GÉNERO</div><div class="dato-valor">${personaje.genero}</div></div>
+                <div class="dato-item"><div class="dato-label">ALTURA</div><div class="dato-valor">${personaje.altura}</div></div>
+            `;
+
+            // Mostrar barras
+            document.getElementById('barras-container').innerHTML = `
+                <div class="barra-item">
+                    <div class="barra-header"><span>FUERZA</span><span>${personaje.stats.fuerza}</span></div>
+                    <div class="barra-contenedor"><div class="barra-llenado barra-fuerza" style="width: ${personaje.stats.fuerza/2}%"></div></div>
+                </div>
+                <div class="barra-item">
+                    <div class="barra-header"><span>MAGIA</span><span>${personaje.stats.magia}</span></div>
+                    <div class="barra-contenedor"><div class="barra-llenado barra-magia" style="width: ${personaje.stats.magia/2}%"></div></div>
+                </div>
+                <div class="barra-item">
+                    <div class="barra-header"><span>ESENCIA</span><span>${personaje.stats.esencia}</span></div>
+                    <div class="barra-contenedor"><div class="barra-llenado barra-esencia" style="width: ${personaje.stats.esencia/2}%"></div></div>
+                </div>
+                <div class="barra-item">
+                    <div class="barra-header"><span>VIDA</span><span>${personaje.stats.vida}/${personaje.stats.vidaMax}</span></div>
+                    <div class="barra-contenedor"><div class="barra-llenado barra-vida" style="width: ${(personaje.stats.vida/personaje.stats.vidaMax)*100}%"></div></div>
+                </div>
+            `;
+
+            // Mostrar habilidades
+            mostrarAtributos('habilidades-container', personaje.habilidades);
+            mostrarAtributos('cuerpo-container', personaje.cuerpo);
+            mostrarAtributos('mente-container', personaje.mente);
+            mostrarAtributos('social-container', personaje.social);
         }
 
-        // Mostrar barras
-        function mostrarBarras() {
-            document.getElementById('valor-fuerza').textContent = personajeData.fuerza;
-            document.getElementById('valor-magia').textContent = personajeData.magia;
-            document.getElementById('valor-esencia').textContent = personajeData.esencia;
-            document.getElementById('valor-vida').textContent = personajeData.vida + '/' + personajeData.vidaMax;
-
-            setTimeout(() => {
-                document.getElementById('barra-fuerza').style.width = Math.min(100, (personajeData.fuerza / 250) * 100) + '%';
-                document.getElementById('barra-magia').style.width = Math.min(100, (personajeData.magia / 250) * 100) + '%';
-                document.getElementById('barra-esencia').style.width = Math.min(100, (personajeData.esencia / 250) * 100) + '%';
-                document.getElementById('barra-vida').style.width = (personajeData.vida / personajeData.vidaMax) * 100 + '%';
-            }, 200);
-        }
-
-        // Mostrar atributos
-        function mostrarAtributos(gridId, datos) {
-            const grid = document.getElementById(gridId);
-            grid.innerHTML = '';
+        function mostrarAtributos(containerId, datos) {
+            const container = document.getElementById(containerId);
+            let html = '';
             
             Object.entries(datos).forEach(([nombre, valor]) => {
-                const item = document.createElement('div');
-                item.className = 'atributo-item';
-                
-                const nombreSpan = document.createElement('span');
-                nombreSpan.className = 'nombre';
-                nombreSpan.textContent = nombre;
-                
-                const circulosDiv = document.createElement('div');
-                circulosDiv.className = 'circulos';
-                
+                let puntos = '';
                 for (let i = 0; i < 5; i++) {
-                    const circulo = document.createElement('div');
-                    circulo.className = `circulo ${i < valor ? 'activo' : 'inactivo'}`;
-                    circulosDiv.appendChild(circulo);
+                    puntos += `<div class="punto ${i < valor ? 'activo' : 'inactivo'}"></div>`;
                 }
                 
-                item.appendChild(nombreSpan);
-                item.appendChild(circulosDiv);
-                grid.appendChild(item);
-            });
-        }
-
-        // Mostrar inventario rápido
-        function mostrarInventario() {
-            const grid = document.getElementById('inventario-grid');
-            grid.innerHTML = '';
-
-            const ultimosItems = personajeData.inventario.slice(0, 5);
-
-            ultimosItems.forEach(item => {
-                const div = document.createElement('div');
-                div.className = `item-inventario ${item.equipado ? 'equipado' : ''}`;
-                div.innerHTML = `
-                    <div class="icono">${item.icono}</div>
-                    <div class="nombre">${item.nombre}</div>
-                    <div class="cantidad">x${item.cantidad}</div>
+                html += `
+                    <div class="atributo-item">
+                        <div class="atributo-nombre">${nombre}</div>
+                        <div class="atributo-puntos">${puntos}</div>
+                    </div>
                 `;
-                grid.appendChild(div);
             });
-
-            // Rellenar espacios vacíos
-            const restantes = 5 - ultimosItems.length;
-            for (let i = 0; i < restantes; i++) {
-                const vacio = document.createElement('div');
-                vacio.className = 'item-vacio';
-                vacio.textContent = 'VACÍO';
-                grid.appendChild(vacio);
-            }
+            
+            container.innerHTML = html;
         }
 
-        // Inicializar
-        window.addEventListener('load', function() {
-            mostrarDatosBasicos();
-            mostrarBarras();
-            mostrarAtributos('grid-habilidades', personajeData.habilidades);
-            mostrarAtributos('grid-cuerpo', personajeData.cuerpo);
-            mostrarAtributos('grid-mente', personajeData.mente);
-            mostrarAtributos('grid-social', personajeData.social);
-            mostrarInventario();
-        });
+        // ===== INVENTARIO =====
+        function renderizarInventario() {
+            const container = document.getElementById('inventario-container');
+            const equipados = personaje.inventario.filter(o => o.equipado).length;
+            document.getElementById('equipados-count').textContent = `${equipados}/3`;
+
+            let html = '<div class="inventario-grid">';
+            
+            personaje.inventario.forEach(item => {
+                const claseExtra = item.equipado ? 'equipado' : '';
+                html += `<button class="objeto-btn ${claseExtra}" onclick="abrirModal(${item.id})">`;
+                html += `<div style="font-size:0.5rem; margin-bottom:5px;">${item.nombre}</div>`;
+                html += `<div style="font-size:0.4rem; color:#ffff66;">x${item.cantidad}</div>`;
+                html += `</button>`;
+            });
+
+            for (let i = personaje.inventario.length; i < 3; i++) {
+                html += `<div class="vacio-btn">VACÍO</div>`;
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // ===== MODAL =====
+        window.abrirModal = function(id) {
+            const item = personaje.inventario.find(i => i.id === id);
+            if (!item) return;
+
+            document.getElementById('modal-texto').textContent = item.nombre;
+            
+            let botones = '';
+            if (item.tipo === 'consumible') {
+                botones = `<button class="modal-btn" onclick="usarItem(${id})">USAR</button>`;
+            } else {
+                if (item.equipado) {
+                    botones = `<button class="modal-btn" onclick="quitarItem(${id})">QUITAR</button>`;
+                } else {
+                    botones = `<button class="modal-btn" onclick="equiparItem(${id})">EQUIPAR</button>`;
+                }
+            }
+            
+            botones += `<button class="modal-btn" onclick="cerrarModal()">CANCELAR</button>`;
+            document.getElementById('modal-botones').innerHTML = botones;
+            
+            document.getElementById('modal').style.display = 'flex';
+        };
+
+        window.cerrarModal = function() {
+            document.getElementById('modal').style.display = 'none';
+        };
+
+        window.equiparItem = function(id) {
+            const item = personaje.inventario.find(i => i.id === id);
+            const equipados = personaje.inventario.filter(o => o.equipado).length;
+            
+            if (equipados >= 3) {
+                alert('* Solo puedes equipar 3 objetos');
+                cerrarModal();
+                return;
+            }
+            
+            item.equipado = true;
+            renderizarInventario();
+            cerrarModal();
+        };
+
+        window.quitarItem = function(id) {
+            const item = personaje.inventario.find(i => i.id === id);
+            item.equipado = false;
+            renderizarInventario();
+            cerrarModal();
+        };
+
+        window.usarItem = function(id) {
+            const item = personaje.inventario.find(i => i.id === id);
+            item.cantidad--;
+            
+            if (item.cantidad === 0) {
+                personaje.inventario = personaje.inventario.filter(i => i.id !== id);
+            }
+            
+            renderizarInventario();
+            cerrarModal();
+        };
+
+        // INICIALIZAR
+        cargarPersonaje();
+        renderizarInventario();
     </script>
 </body>
 </html>
