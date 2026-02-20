@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÍGNEO - ADMINISTRACIÓN</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        @font-face {
+            font-family: 'Determination';
+            src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Press Start 2P', monospace;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .estrellas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .estrella {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #ffffff;
+            opacity: 0;
+            animation: parpadear 3s infinite;
+        }
+
+        @keyframes parpadear {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .caja-undertale {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 3px solid #ffffff;
+            background: #000000;
+            padding: 30px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ffff66;
+        }
+
+        .linea {
+            width: 100%;
+            height: 3px;
+            background: #ffffff;
+            margin: 20px 0 30px;
+        }
+
+        /* PESTAÑAS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            flex: 1;
+            background: #000000;
+            border: 2px solid #ffffff;
+            color: #ffffff;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            padding: 15px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tab.activo {
+            background: #ffff66;
+            color: #000000;
+            border-color: #ffff66;
+        }
+
+        .tab:hover {
+            border-color: #ffff66;
+            color: #ffff66;
+        }
+
+        /* TABLA DE SOLICITUDES */
+        .tabla-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+        }
+
+        th {
+            background: #1a1a2a;
+            color: #ffff66;
+            padding: 15px;
+            text-align: left;
+            border: 2px solid #ffffff;
+        }
+
+        td {
+            padding: 12px;
+            border: 2px solid #444444;
+            color: #ffffff;
+        }
+
+        tr:hover {
+            background: #0a0a1a;
+        }
+
+        .estado-pendiente {
+            color: #ffff66;
+        }
+
+        .estado-aprobado {
+            color: #55ff55;
+        }
+
+        .estado-rechazado {
+            color: #ff5555;
+        }
+
+        /* BOTONES DE ACCIÓN */
+        .btn-accion {
+            background: #000000;
+            border: 2px solid #ffffff;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            padding: 8px 12px;
+            cursor: pointer;
+            margin: 0 3px;
+        }
+
+        .btn-accion.aprobar {
+            border-color: #55ff55;
+            color: #55ff55;
+        }
+
+        .btn-accion.aprobar:hover {
+            background: #003300;
+        }
+
+        .btn-accion.rechazar {
+            border-color: #ff5555;
+            color: #ff5555;
+        }
+
+        .btn-accion.rechazar:hover {
+            background: #330000;
+        }
+
+        .btn-accion.ver {
+            border-color: #ffff66;
+            color: #ffff66;
+        }
+
+        .btn-accion.ver:hover {
+            background: #333300;
+        }
+
+        /* MODAL DE DETALLE */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #000000;
+            border: 3px solid #ffff66;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-titulo {
+            color: #ffff66;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-datos {
+            border: 2px solid #444444;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .modal-dato {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 0.7rem;
+        }
+
+        .modal-dato .label {
+            color: #7f7f7f;
+        }
+
+        .modal-dato .valor {
+            color: #ffff66;
+        }
+
+        .modal-atributos {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-atributo {
+            border: 1px solid #444444;
+            padding: 10px;
+        }
+
+        .modal-atributo .titulo {
+            color: #ffff66;
+            font-size: 0.6rem;
+            margin-bottom: 5px;
+        }
+
+        .modal-puntos {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+        }
+
+        .punto {
+            width: 12px;
+            height: 12px;
+            border: 1px solid #ffffff;
+            background: #000000;
+        }
+
+        .punto.activo {
+            background: #ffff66;
+        }
+
+        .modal-input {
+            margin: 20px 0;
+        }
+
+        .modal-input label {
+            display: block;
+            color: #ffff66;
+            font-size: 0.7rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-input input {
+            width: 100%;
+            padding: 12px;
+            background: #000000;
+            border: 2px solid #ffffff;
+            color: #ffffff;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+        }
+
+        .modal-botones {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            background: #000000;
+            border: 2px solid #ffffff;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .modal-btn.aprobar {
+            border-color: #55ff55;
+            color: #55ff55;
+        }
+
+        .modal-btn.rechazar {
+            border-color: #ff5555;
+            color: #ff5555;
+        }
+
+        .modal-btn:hover {
+            transform: translate(-2px, -2px);
+        }
+
+        /* BOTÓN VOLVER */
+        .btn-volver {
+            background: #000000;
+            border: 2px solid #ffffff;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.9rem;
+            padding: 15px 30px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .btn-volver:hover {
+            border-color: #ffff66;
+            color: #ffff66;
+        }
+
+        /* CONTADORES */
+        .contadores {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .contador {
+            flex: 1;
+            border: 2px solid #ffffff;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .contador .numero {
+            color: #ffff66;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .contador .etiqueta {
+            color: #7f7f7f;
+            font-size: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="estrellas" id="estrellas"></div>
+
+    <div class="caja-undertale">
+        <h1>ADMINISTRACIÓN</h1>
+        <div class="linea"></div>
+
+        <!-- CONTADORES -->
+        <div class="contadores">
+            <div class="contador">
+                <div class="numero" id="pendientes-count">0</div>
+                <div class="etiqueta">PENDIENTES</div>
+            </div>
+            <div class="contador">
+                <div class="numero" id="aprobados-count">0</div>
+                <div class="etiqueta">APROBADOS</div>
+            </div>
+            <div class="contador">
+                <div class="numero" id="rechazados-count">0</div>
+                <div class="etiqueta">RECHAZADOS</div>
+            </div>
+        </div>
+
+        <!-- PESTAÑAS -->
+        <div class="tabs">
+            <div class="tab activo" onclick="cargarSolicitudes('pendiente')">PENDIENTES</div>
+            <div class="tab" onclick="cargarSolicitudes('aprobado')">APROBADOS</div>
+            <div class="tab" onclick="cargarSolicitudes('rechazado')">RECHAZADOS</div>
+        </div>
+
+        <!-- TABLA DE SOLICITUDES -->
+        <div class="tabla-container">
+            <table id="tabla-solicitudes">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>FECHA</th>
+                        <th>NOMBRE</th>
+                        <th>RAZA</th>
+                        <th>RANGO</th>
+                        <th>EMAIL</th>
+                        <th>ESTADO</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-solicitudes">
+                    <!-- Se llenará con JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- BOTÓN VOLVER -->
+        <button class="btn-volver" onclick="window.location.href='menu-desbloqueado.html'">
+            VOLVER AL MENÚ
+        </button>
+    </div>
+
+    <!-- MODAL DE DETALLE -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <div class="modal-titulo" id="modal-titulo">DETALLE DEL PERSONAJE</div>
+            
+            <div class="modal-datos" id="modal-datos"></div>
+            
+            <div class="modal-atributos" id="modal-atributos"></div>
+            
+            <div class="modal-input" id="modal-input" style="display: none;">
+                <label>LLAVE ÚNICA DE ACCESO:</label>
+                <input type="text" id="llave-unica" placeholder="EJ: FEN-123-RIX" value="" autocomplete="off">
+            </div>
+            
+            <div class="modal-botones" id="modal-botones"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONEXIÓN A SUPABASE =====
+        const SUPABASE_URL = 'https://iwqeikrjhyqxyduvhhkg.supabase.co';
+        const SUPABASE_KEY = 'unsrhffwguwfebhppptz';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // GENERAR ESTRELLAS
+        for (let i = 0; i < 150; i++) {
+            const estrella = document.createElement('div');
+            estrella.className = 'estrella';
+            estrella.style.left = Math.random() * 100 + '%';
+            estrella.style.top = Math.random() * 100 + '%';
+            estrella.style.animationDelay = Math.random() * 3 + 's';
+            document.getElementById('estrellas').appendChild(estrella);
+        }
+
+        // ===== VARIABLES GLOBALES =====
+        let solicitudes = [];
+        let estadoActual = 'pendiente';
+        let personajeSeleccionado = null;
+
+        // ===== CARGAR SOLICITUDES DESDE SUPABASE =====
+        async function cargarSolicitudes(estado) {
+            estadoActual = estado;
+            
+            // Actualizar pestañas
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('activo'));
+            if (estado === 'pendiente') document.querySelectorAll('.tab')[0].classList.add('activo');
+            if (estado === 'aprobado') document.querySelectorAll('.tab')[1].classList.add('activo');
+            if (estado === 'rechazado') document.querySelectorAll('.tab')[2].classList.add('activo');
+
+            try {
+                const { data, error } = await supabase
+                    .from('personajes')
+                    .select('*')
+                    .eq('estado', estado)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                solicitudes = data || [];
+                renderizarTabla();
+                actualizarContadores();
+
+            } catch (error) {
+                console.error('Error cargando solicitudes:', error);
+            }
+        }
+
+        // ===== ACTUALIZAR CONTADORES =====
+        async function actualizarContadores() {
+            try {
+                const { data: pendientes } = await supabase
+                    .from('personajes')
+                    .select('id', { count: 'exact' })
+                    .eq('estado', 'pendiente');
+
+                const { data: aprobados } = await supabase
+                    .from('personajes')
+                    .select('id', { count: 'exact' })
+                    .eq('estado', 'aprobado');
+
+                const { data: rechazados } = await supabase
+                    .from('personajes')
+                    .select('id', { count: 'exact' })
+                    .eq('estado', 'rechazado');
+
+                document.getElementById('pendientes-count').textContent = pendientes.length || 0;
+                document.getElementById('aprobados-count').textContent = aprobados.length || 0;
+                document.getElementById('rechazados-count').textContent = rechazados.length || 0;
+
+            } catch (error) {
+                console.error('Error actualizando contadores:', error);
+            }
+        }
+
+        // ===== RENDERIZAR TABLA =====
+        function renderizarTabla() {
+            const tbody = document.getElementById('tbody-solicitudes');
+            tbody.innerHTML = '';
+
+            solicitudes.forEach(solicitud => {
+                const tr = document.createElement('tr');
+                
+                // Formatear fecha
+                const fecha = new Date(solicitud.created_at).toLocaleDateString('es-ES');
+                
+                // Clase según estado
+                let estadoClass = '';
+                if (solicitud.estado === 'pendiente') estadoClass = 'estado-pendiente';
+                if (solicitud.estado === 'aprobado') estadoClass = 'estado-aprobado';
+                if (solicitud.estado === 'rechazado') estadoClass = 'estado-rechazado';
+
+                tr.innerHTML = `
+                    <td>${solicitud.id}</td>
+                    <td>${fecha}</td>
+                    <td>${solicitud.nombre || '---'}</td>
+                    <td>${solicitud.raza || '---'}</td>
+                    <td>${solicitud.rango || '---'}</td>
+                    <td>${solicitud.email || '---'}</td>
+                    <td class="${estadoClass}">${solicitud.estado?.toUpperCase() || '---'}</td>
+                    <td>
+                        <button class="btn-accion ver" onclick="verDetalle(${solicitud.id})">VER</button>
+                        ${solicitud.estado === 'pendiente' ? `
+                            <button class="btn-accion aprobar" onclick="mostrarAprobar(${solicitud.id})">✓</button>
+                            <button class="btn-accion rechazar" onclick="rechazarPersonaje(${solicitud.id})">✗</button>
+                        ` : ''}
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ===== VER DETALLE COMPLETO =====
+        function verDetalle(id) {
+            const personaje = solicitudes.find(s => s.id === id);
+            if (!personaje) return;
+
+            personajeSeleccionado = personaje;
+
+            // Datos básicos
+            const datosHTML = `
+                <div class="modal-dato">
+                    <span class="label">ID:</span>
+                    <span class="valor">${personaje.id}</span>
+                </div>
+                <div class="modal-dato">
+                    <span class="label">NOMBRE:</span>
+                    <span class="valor">${personaje.nombre || '---'}</span>
+                </div>
+                <div class="modal-dato">
+                    <span class="label">EMAIL:</span>
+                    <span class="valor">${personaje.email || '---'}</span>
+                </div>
+                <div class="modal-dato">
+                    <span class="label">RAZA:</span>
+                    <span class="valor">${personaje.raza || '---'}</span>
+                </div>
+                <div class="modal-dato">
+                    <span class="label">RANGO:</span>
+                    <span class="valor">${personaje.rango || '---'}</span>
+                </div>
+                <div class="modal-dato">
+                    <span class="label">EDAD:</span>
+                    <span class="valor">${personaje.edad || '---'}</span>
+                </div>
+                <div class="modal-dato">
+                    <span class="label">GÉNERO:</span>
+                    <span class="valor">${personaje.genero || '---'}</span>
+                </div>
+                <div class="modal-dato">
+                    <span class="label">ALTURA:</span>
+                    <span class="valor">${personaje.altura || '---'}</span>
+                </div>
+            `;
+            document.getElementById('modal-datos').innerHTML = datosHTML;
+
+            // Atributos (habilidades, cuerpo, mente, social)
+            let atributosHTML = '';
+
+            if (personaje.habilidades) {
+                let puntosHab = '';
+                for (let i = 0; i < 5; i++) {
+                    puntosHab += `<div class="punto ${i < 3 ? 'activo' : ''}"></div>`;
+                }
+                atributosHTML += `
+                    <div class="modal-atributo">
+                        <div class="titulo">HABILIDADES (EJEMPLO)</div>
+                        <div class="modal-puntos">${puntosHab}</div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('modal-atributos').innerHTML = atributosHTML;
+
+            // Si está pendiente, mostrar campo para llave
+            if (personaje.estado === 'pendiente') {
+                document.getElementById('modal-input').style.display = 'block';
+                document.getElementById('llave-unica').value = generarLlaveEjemplo(personaje.nombre);
+                
+                document.getElementById('modal-botones').innerHTML = `
+                    <button class="modal-btn aprobar" onclick="aprobarPersonaje()">APROBAR</button>
+                    <button class="modal-btn rechazar" onclick="rechazarPersonaje(${personaje.id})">RECHAZAR</button>
+                    <button class="modal-btn" onclick="cerrarModal()">CANCELAR</button>
+                `;
+            } else {
+                document.getElementById('modal-input').style.display = 'none';
+                document.getElementById('modal-botones').innerHTML = `
+                    <button class="modal-btn" onclick="cerrarModal()">CERRAR</button>
+                `;
+            }
+
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        // ===== GENERAR LLAVE DE EJEMPLO =====
+        function generarLlaveEjemplo(nombre) {
+            if (!nombre) return 'XXX-000-XXX';
+            const prefijo = nombre.substring(0, 3).toUpperCase();
+            const numero = Math.floor(Math.random() * 900) + 100;
+            return `${prefijo}-${numero}-${prefijo}`;
+        }
+
+        // ===== MOSTRAR APROBAR (DESDE TABLA) =====
+        function mostrarAprobar(id) {
+            const personaje = solicitudes.find(s => s.id === id);
+            if (!personaje) return;
+
+            personajeSeleccionado = personaje;
+            
+            document.getElementById('modal-datos').innerHTML = `
+                <div class="modal-dato">
+                    <span class="label">NOMBRE:</span>
+                    <span class="valor">${personaje.nombre}</span>
+                </div>
+            `;
+            
+            document.getElementById('modal-input').style.display = 'block';
+            document.getElementById('llave-unica').value = generarLlaveEjemplo(personaje.nombre);
+            
+            document.getElementById('modal-botones').innerHTML = `
+                <button class="modal-btn aprobar" onclick="aprobarPersonaje()">APROBAR</button>
+                <button class="modal-btn rechazar" onclick="rechazarPersonaje(${personaje.id})">RECHAZAR</button>
+                <button class="modal-btn" onclick="cerrarModal()">CANCELAR</button>
+            `;
+            
+            document.getElementById('modal-titulo').textContent = 'APROBAR PERSONAJE';
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        // ===== APROBAR PERSONAJE =====
+        async function aprobarPersonaje() {
+            if (!personajeSeleccionado) return;
+
+            const llaveUnica = document.getElementById('llave-unica').value.trim();
+            
+            if (!llaveUnica) {
+                alert('* DEBES INGRESAR UNA LLAVE ÚNICA');
+                return;
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('personajes')
+                    .update({ 
+                        estado: 'aprobado',
+                        llave_unica: llaveUnica
+                    })
+                    .eq('id', personajeSeleccionado.id);
+
+                if (error) throw error;
+
+                alert(`* PERSONAJE APROBADO\nLLAVE: ${llaveUnica}`);
+                
+                cerrarModal();
+                cargarSolicitudes(estadoActual);
+                actualizarContadores();
+
+            } catch (error) {
+                console.error('Error aprobando personaje:', error);
+                alert('* ERROR AL APROBAR');
+            }
+        }
+
+        // ===== RECHAZAR PERSONAJE =====
+        async function rechazarPersonaje(id) {
+            if (!confirm('* ¿RECHAZAR ESTE PERSONAJE?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('personajes')
+                    .update({ estado: 'rechazado' })
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                alert('* PERSONAJE RECHAZADO');
+                
+                cerrarModal();
+                cargarSolicitudes(estadoActual);
+                actualizarContadores();
+
+            } catch (error) {
+                console.error('Error rechazando personaje:', error);
+                alert('* ERROR AL RECHAZAR');
+            }
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal').style.display = 'none';
+            personajeSeleccionado = null;
+        }
+
+        // ===== INICIALIZAR =====
+        cargarSolicitudes('pendiente');
+    </script>
+</body>
+</html>
