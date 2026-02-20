@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÍGNEO - TIENDA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -389,12 +390,12 @@
         <!-- INFO SUPERIOR -->
         <div class="info-superior" id="info-superior">
             <div class="tienda-info">
-                <h2 id="tienda-nombre">EL CÁLIZ ETERNO</h2>
-                <div class="tipo" id="tienda-tipo">CONSUMIBLES</div>
+                <h2 id="tienda-nombre">---</h2>
+                <div class="tipo" id="tienda-tipo">---</div>
             </div>
             <div class="cristales">
                 <span class="label">CRISTALES:</span>
-                <span class="valor" id="cristales">2450</span>
+                <span class="valor" id="cristales">0</span>
             </div>
         </div>
 
@@ -447,6 +448,11 @@
     </div>
 
     <script>
+        // ===== CONEXIÓN A SUPABASE =====
+        const SUPABASE_URL = 'https://iwqeikrjhyqxyduvhhkg.supabase.co';
+        const SUPABASE_KEY = 'unsrhffwguwfebhppptz';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         // GENERAR ESTRELLAS
         for (let i = 0; i < 150; i++) {
             const estrella = document.createElement('div');
@@ -461,89 +467,113 @@
         const urlParams = new URLSearchParams(window.location.search);
         const tiendaId = parseInt(urlParams.get('id')) || 1;
 
-        // ===== DATOS DE LAS TIENDAS =====
-        const tiendasData = {
-            1: {
-                nombre: 'EL CÁLIZ ETERNO',
-                tipo: 'CONSUMIBLES',
-                objetos: [
-                    { id: 1, nombre: 'NÉCTAR DE YGGDRASIL', tipo: 'consumible', icono: 'pocion', precio: 150, stats: { fuerza: 150, magia: 100, esencia: -30, vida: 50 } },
-                    { id: 2, nombre: 'CARNE DE QUIMERA', tipo: 'consumible', icono: 'pocion', precio: 300, stats: { fuerza: 80, magia: -10, esencia: 15, vida: 0 } },
-                    { id: 3, nombre: 'RAÍZ DE MANDRÁGORA', tipo: 'consumible', icono: 'pocion', precio: 120, stats: { fuerza: 40, magia: -20, esencia: -5, vida: 0 } },
-                    { id: 4, nombre: 'MIEL DE HADA', tipo: 'consumible', icono: 'pocion', precio: 400, stats: { fuerza: 60, magia: 50, esencia: 2, vida: 15 } },
-                    { id: 5, nombre: 'HONGO ALUCINÓGENO', tipo: 'consumible', icono: 'pocion', precio: 250, stats: { fuerza: -15, magia: 100, esencia: 20, vida: -10 } },
-                    { id: 6, nombre: 'FRUTA DEL NEMETON', tipo: 'consumible', icono: 'pocion', precio: 400, stats: { fuerza: 40, magia: 40, esencia: 10, vida: 30 } },
-                    { id: 7, nombre: 'FRASCO DE NIEBLA', tipo: 'consumible', icono: 'pocion', precio: 850, stats: { fuerza: 0, magia: -30, esencia: 0, vida: 0 } },
-                    { id: 8, nombre: 'LÁGRIMA DE INTEGRA', tipo: 'consumible', icono: 'pocion', precio: 15000, stats: { fuerza: 1000, magia: 80, esencia: 50, vida: 30 } },
-                    { id: 9, nombre: 'VIAL DE SANGRE', tipo: 'consumible', icono: 'pocion', precio: 500, stats: { fuerza: 100, magia: 15, esencia: 5, vida: 10 } },
-                    { id: 10, nombre: 'POCIÓN DE VIDA', tipo: 'consumible', icono: 'pocion', precio: 200, stats: { fuerza: 0, magia: 0, esencia: 0, vida: 100 } }
-                ]
-            },
-            2: {
-                nombre: 'RELIQUIAS DEL ALBA',
-                tipo: 'SAGRADOS',
-                objetos: [
-                    { id: 11, nombre: 'MAPA DEL REINO', tipo: 'sagrado', icono: 'sagrado', precio: 150000, stats: { fuerza: 0, magia: 1000, esencia: 200, vida: 0 } },
-                    { id: 12, nombre: 'CÁLIZ DE SANGRE', tipo: 'sagrado', icono: 'sagrado', precio: 1000, stats: { fuerza: 100, magia: 100, esencia: 100, vida: 10 } },
-                    { id: 13, nombre: 'RELOJ DE ARENA', tipo: 'sagrado', icono: 'sagrado', precio: 60000, stats: { fuerza: -50, magia: 300, esencia: 0, vida: 80 } },
-                    { id: 14, nombre: 'HUEVO DE FÉNIX', tipo: 'sagrado', icono: 'sagrado', precio: 80, stats: { fuerza: 1000, magia: 150, esencia: 20, vida: 100 } },
-                    { id: 15, nombre: 'OJO DE LA VERDAD', tipo: 'sagrado', icono: 'sagrado', precio: 35000, stats: { fuerza: -60, magia: 400, esencia: 0, vida: 90 } },
-                    { id: 16, nombre: 'CONTRATO DE ALMA', tipo: 'sagrado', icono: 'sagrado', precio: 0, stats: { fuerza: 666, magia: 666, esencia: 150, vida: -200 } },
-                    { id: 17, nombre: 'CORONA DE ESPINAS', tipo: 'sagrado', icono: 'sagrado', precio: 20000, stats: { fuerza: -10, magia: 70, esencia: 30, vida: 120 } },
-                    { id: 18, nombre: 'GRIMORIO DE STOLAS', tipo: 'sagrado', icono: 'sagrado', precio: 25000, stats: { fuerza: -70, magia: 500, esencia: 40, vida: -60 } },
-                    { id: 19, nombre: 'ANILLO DEL REY', tipo: 'sagrado', icono: 'sagrado', precio: 50000, stats: { fuerza: 30, magia: 60, esencia: 10, vida: 40 } }
-                ]
-            },
-            3: {
-                nombre: 'EL YUNQUE CENIZO',
-                tipo: 'EQUIPO',
-                objetos: [
-                    { id: 20, nombre: 'DAGA DE BASILISCO', tipo: 'equipo', icono: 'daga', precio: 1500, stats: { fuerza: -20, magia: 25, esencia: -5, vida: 0 } },
-                    { id: 21, nombre: 'LANZA DE SOMBRAS', tipo: 'equipo', icono: 'espada', precio: 4000, stats: { fuerza: -10, magia: -40, esencia: 60, vida: -15 } },
-                    { id: 22, nombre: 'TRIDENTE DE CORAL', tipo: 'equipo', icono: 'espada', precio: 3200, stats: { fuerza: 0, magia: 30, esencia: 45, vida: 15 } },
-                    { id: 23, nombre: 'GUANTELETES DE ZERO', tipo: 'equipo', icono: 'armadura', precio: 4500, stats: { fuerza: 0, magia: -60, esencia: 55, vida: 0 } },
-                    { id: 24, nombre: 'ESPADA DE HIERRO', tipo: 'equipo', icono: 'espada', precio: 1100, stats: { fuerza: 0, magia: 0, esencia: 30, vida: -20 } },
-                    { id: 25, nombre: 'HACHA DE BATALLA', tipo: 'equipo', icono: 'espada', precio: 1300, stats: { fuerza: 0, magia: 0, esencia: 40, vida: 0 } },
-                    { id: 26, nombre: 'LÁTIGO DE FUEGO', tipo: 'equipo', icono: 'espada', precio: 2700, stats: { fuerza: -5, magia: 20, esencia: 35, vida: -10 } },
-                    { id: 27, nombre: 'CAPA DE CUERVO', tipo: 'equipo', icono: 'armadura', precio: 2800, stats: { fuerza: 15, magia: 20, esencia: 5, vida: -10 } },
-                    { id: 28, nombre: 'TÚNICA DE ARAÑA', tipo: 'equipo', icono: 'armadura', precio: 3800, stats: { fuerza: 10, magia: 200, esencia: 0, vida: 50 } },
-                    { id: 29, nombre: 'BOTAS ALADAS', tipo: 'equipo', icono: 'armadura', precio: 5000, stats: { fuerza: 5, magia: 40, esencia: 10, vida: 20 } },
-                    { id: 30, nombre: 'MANTO DE LUMA', tipo: 'equipo', icono: 'armadura', precio: 6200, stats: { fuerza: 60, magia: 60, esencia: 15, vida: 30 } },
-                    { id: 31, nombre: 'CASCO DE ZERO', tipo: 'equipo', icono: 'armadura', precio: 2000, stats: { fuerza: 10, magia: 0, esencia: 5, vida: 0 } }
-                ]
-            },
-            4: {
-                nombre: 'ESENCIA PURA',
-                tipo: 'MATERIALES',
-                objetos: [
-                    { id: 32, nombre: 'LINGOTE DE HIERRO', tipo: 'material', icono: 'material', precio: 500, stats: { fuerza: 0, magia: 0, esencia: 10, vida: -5 } },
-                    { id: 33, nombre: 'POLVO DE DIAMANTE', tipo: 'material', icono: 'material', precio: 1500, stats: { fuerza: 0, magia: 20, esencia: 5, vida: 25 } },
-                    { id: 34, nombre: 'ACEITE DE TELQUINES', tipo: 'material', icono: 'material', precio: 400, stats: { fuerza: 0, magia: 0, esencia: 2, vida: 5 } }
-                ]
-            },
-            5: {
-                nombre: 'EL BAZAR UMBRÍO',
-                tipo: 'MISCELÁNEOS',
-                objetos: [
-                    { id: 35, nombre: 'BRÚJULA DE CASSIUS', tipo: 'misc', icono: 'default', precio: 9000, stats: { fuerza: 0, magia: 80, esencia: 0, vida: 60 } },
-                    { id: 36, nombre: 'LLAVE DE CRISTAL', tipo: 'misc', icono: 'default', precio: 12000, stats: { fuerza: -50, magia: 0, esencia: 0, vida: 0 } },
-                    { id: 37, nombre: 'PIEDRA DEL HOGAR', tipo: 'misc', icono: 'default', precio: 6000, stats: { fuerza: 0, magia: -150, esencia: 0, vida: 10 } },
-                    { id: 38, nombre: 'DIENTE DE MEGALODÓN', tipo: 'misc', icono: 'default', precio: 22000, stats: { fuerza: 0, magia: 0, esencia: 110, vida: 20 } }
-                ]
-            }
+        // ===== VARIABLES GLOBALES =====
+        let personaje = {
+            id: null,
+            cristales: 0
         };
-
-        // ===== OBTENER TIENDA ACTUAL =====
-        const tiendaActual = tiendasData[tiendaId] || tiendasData[1];
-        let objetos = tiendaActual.objetos || [];
-        let objetoSeleccionado = objetos[0] || null;
+        let tiendaActual = {
+            nombre: '---',
+            tipo: '---',
+            objetos: []
+        };
+        let objetoSeleccionado = null;
         let cantidad = 1;
-        let cristales = 2450; // Esto vendría del personaje
 
-        // ===== ACTUALIZAR INFO DE LA TIENDA =====
-        document.getElementById('tienda-nombre').textContent = tiendaActual.nombre;
-        document.getElementById('tienda-tipo').textContent = tiendaActual.tipo;
-        document.getElementById('cristales').textContent = cristales;
+        // ===== CARGAR DATOS DEL PERSONAJE =====
+        async function cargarPersonaje() {
+            const personajeActivo = localStorage.getItem('personajeActivo');
+            
+            if (!personajeActivo) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const { id } = JSON.parse(personajeActivo);
+            personaje.id = id;
+
+            try {
+                const { data, error } = await supabase
+                    .from('personajes')
+                    .select('dinero')
+                    .eq('id', id)
+                    .single();
+
+                if (error || !data) {
+                    console.error('Error cargando personaje:', error);
+                    return;
+                }
+
+                personaje.cristales = data.dinero || 0;
+                document.getElementById('cristales').textContent = personaje.cristales;
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== CARGAR TIENDA DESDE SUPABASE =====
+        async function cargarTienda() {
+            try {
+                // Aquí deberías cargar los datos de la tienda desde Supabase
+                // Por ahora usamos los datos quemados
+                const tiendasData = {
+                    1: {
+                        nombre: 'EL CÁLIZ ETERNO',
+                        tipo: 'CONSUMIBLES',
+                        objetos: [
+                            { id: 1, nombre: 'NÉCTAR DE YGGDRASIL', tipo: 'consumible', icono: 'pocion', precio: 150, stats: { fuerza: 150, magia: 100, esencia: -30, vida: 50 } },
+                            { id: 2, nombre: 'CARNE DE QUIMERA', tipo: 'consumible', icono: 'pocion', precio: 300, stats: { fuerza: 80, magia: -10, esencia: 15, vida: 0 } },
+                            { id: 3, nombre: 'RAÍZ DE MANDRÁGORA', tipo: 'consumible', icono: 'pocion', precio: 120, stats: { fuerza: 40, magia: -20, esencia: -5, vida: 0 } },
+                            { id: 4, nombre: 'MIEL DE HADA', tipo: 'consumible', icono: 'pocion', precio: 400, stats: { fuerza: 60, magia: 50, esencia: 2, vida: 15 } }
+                        ]
+                    },
+                    2: {
+                        nombre: 'RELIQUIAS DEL ALBA',
+                        tipo: 'SAGRADOS',
+                        objetos: [
+                            { id: 11, nombre: 'MAPA DEL REINO', tipo: 'sagrado', icono: 'sagrado', precio: 150000, stats: { fuerza: 0, magia: 1000, esencia: 200, vida: 0 } },
+                            { id: 12, nombre: 'CÁLIZ DE SANGRE', tipo: 'sagrado', icono: 'sagrado', precio: 1000, stats: { fuerza: 100, magia: 100, esencia: 100, vida: 10 } }
+                        ]
+                    },
+                    3: {
+                        nombre: 'EL YUNQUE CENIZO',
+                        tipo: 'EQUIPO',
+                        objetos: [
+                            { id: 20, nombre: 'DAGA DE BASILISCO', tipo: 'equipo', icono: 'daga', precio: 1500, stats: { fuerza: -20, magia: 25, esencia: -5, vida: 0 } },
+                            { id: 21, nombre: 'LANZA DE SOMBRAS', tipo: 'equipo', icono: 'espada', precio: 4000, stats: { fuerza: -10, magia: -40, esencia: 60, vida: -15 } }
+                        ]
+                    },
+                    4: {
+                        nombre: 'ESENCIA PURA',
+                        tipo: 'MATERIALES',
+                        objetos: [
+                            { id: 32, nombre: 'LINGOTE DE HIERRO', tipo: 'material', icono: 'material', precio: 500, stats: { fuerza: 0, magia: 0, esencia: 10, vida: -5 } }
+                        ]
+                    },
+                    5: {
+                        nombre: 'EL BAZAR UMBRÍO',
+                        tipo: 'MISCELÁNEOS',
+                        objetos: [
+                            { id: 35, nombre: 'BRÚJULA DE CASSIUS', tipo: 'misc', icono: 'default', precio: 9000, stats: { fuerza: 0, magia: 80, esencia: 0, vida: 60 } }
+                        ]
+                    }
+                };
+
+                tiendaActual = tiendasData[tiendaId] || tiendasData[1];
+                
+                document.getElementById('tienda-nombre').textContent = tiendaActual.nombre;
+                document.getElementById('tienda-tipo').textContent = tiendaActual.tipo;
+
+                renderizarLista();
+                if (tiendaActual.objetos.length > 0) {
+                    seleccionarObjeto(tiendaActual.objetos[0]);
+                }
+
+            } catch (error) {
+                console.error('Error cargando tienda:', error);
+            }
+        }
 
         // ===== FUNCIÓN PARA OBTENER CLASE DE ICONO =====
         function getIconClass(icono) {
@@ -563,7 +593,7 @@
             const lista = document.getElementById('lista-objetos');
             lista.innerHTML = '';
 
-            objetos.forEach(obj => {
+            tiendaActual.objetos.forEach(obj => {
                 const item = document.createElement('div');
                 item.className = `objeto-item ${objetoSeleccionado && objetoSeleccionado.id === obj.id ? 'seleccionado' : ''}`;
                 
@@ -615,7 +645,7 @@
         }
 
         // ===== COMPRAR OBJETO =====
-        function comprarObjeto() {
+        async function comprarObjeto() {
             if (!objetoSeleccionado) {
                 alert('* SELECCIONA UN OBJETO PRIMERO');
                 return;
@@ -623,17 +653,48 @@
 
             const precioTotal = objetoSeleccionado.precio * cantidad;
 
-            if (cristales < precioTotal) {
+            if (personaje.cristales < precioTotal) {
                 alert('* NO TIENES SUFICIENTES CRISTALES');
                 return;
             }
 
-            cristales -= precioTotal;
-            document.getElementById('cristales').textContent = cristales;
+            try {
+                // 1. Actualizar cristales del personaje
+                const nuevosCristales = personaje.cristales - precioTotal;
+                const { error: updateError } = await supabase
+                    .from('personajes')
+                    .update({ dinero: nuevosCristales })
+                    .eq('id', personaje.id);
 
-            alert(`* COMPRA EXITOSA\n${cantidad} x ${objetoSeleccionado.nombre}`);
-            
-            // Aquí se guardaría en Supabase el inventario
+                if (updateError) throw updateError;
+
+                // 2. Añadir objetos al inventario
+                for (let i = 0; i < cantidad; i++) {
+                    const { error: insertError } = await supabase
+                        .from('inventario')
+                        .insert([{
+                            personaje_id: personaje.id,
+                            nombre: objetoSeleccionado.nombre,
+                            tipo: objetoSeleccionado.tipo,
+                            cantidad: 1,
+                            equipado: false,
+                            icono: objetoSeleccionado.icono,
+                            stats: objetoSeleccionado.stats
+                        }]);
+
+                    if (insertError) throw insertError;
+                }
+
+                // 3. Actualizar variable local
+                personaje.cristales = nuevosCristales;
+                document.getElementById('cristales').textContent = personaje.cristales;
+
+                alert(`* COMPRA EXITOSA\n${cantidad} x ${objetoSeleccionado.nombre}`);
+
+            } catch (error) {
+                console.error('Error en la compra:', error);
+                alert('* ERROR EN LA COMPRA');
+            }
         }
 
         // ===== LIMPIAR SELECCIÓN =====
@@ -652,10 +713,12 @@
         }
 
         // ===== INICIALIZAR =====
-        renderizarLista();
-        if (objetos.length > 0) {
-            seleccionarObjeto(objetos[0]);
+        async function inicializar() {
+            await cargarPersonaje();
+            await cargarTienda();
         }
+
+        inicializar();
 
         // Hacer funciones globales
         window.cambiarCantidad = cambiarCantidad;
