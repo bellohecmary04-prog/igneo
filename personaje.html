@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÍGNEO - FICHA DE PERSONAJE</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -403,6 +404,11 @@
     </div>
 
     <script>
+        // ===== CONEXIÓN A SUPABASE =====
+        const SUPABASE_URL = 'https://iwqeikrjhyqxyduvhhkg.supabase.co';
+        const SUPABASE_KEY = 'unsrhffwguwfebhppptz';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         // GENERAR ESTRELLAS
         for (let i = 0; i < 150; i++) {
             const estrella = document.createElement('div');
@@ -413,85 +419,126 @@
             document.getElementById('estrellas').appendChild(estrella);
         }
 
-        // ===== CARGAR DATOS DEL FORMULARIO =====
+        // ===== VARIABLES GLOBALES =====
         let personaje = null;
+        let inventarioItems = [];
 
-        function cargarPersonaje() {
-            const guardado = localStorage.getItem('personajeData');
+        // ===== CARGAR PERSONAJE DESDE SUPABASE =====
+        async function cargarPersonaje() {
+            // Obtener personaje activo de localStorage
+            const personajeActivo = localStorage.getItem('personajeActivo');
             
-            if (guardado) {
-                personaje = JSON.parse(guardado);
-            } else {
-                // Datos de ejemplo si no hay guardado
-                personaje = {
-                    nombre: 'KAELEN',
-                    raza: 'EL FÉNIX',
-                    rango: 'RANGO IV: ÉLITE/PROTECTOR',
-                    edad: '245',
-                    genero: 'MASCULINO',
-                    altura: '1.85m',
-                    imagen: null,
-                    stats: { fuerza: 145, magia: 180, esencia: 165, vida: 220, vidaMax: 220 },
-                    habilidades: {
-                        'PERSUASIÓN': 4, 'COMUNICACIÓN': 5, 'PERCEPCIÓN': 3, 'MEDITACIÓN': 4,
-                        'ALFABETISMO': 2, 'CREATIVIDAD': 3, 'TECNOLOGÍA': 1, 'COMBATE': 5,
-                        'SUPERVIVENCIA': 3, 'COQUETA': 0, 'SEDUCCIÓN': 0, 'SUERTE': 2
-                    },
-                    cuerpo: { 'DESTREZA': 4, 'SALUD': 5, 'ENERGÍA': 3, 'BELLEZA': 2, 'ESTILO': 3 },
-                    mente: { 'INTELIGENCIA': 5, 'FELICIDAD': 3, 'ESPIRITUALIDAD': 4, 'CONFIANZA': 3 },
-                    social: { 'CARISMA': 4, 'EMPATÍA': 3, 'AGRESIVIDAD': 2, 'GENEROSIDAD': 3, 'RIQUEZA': 1, 'LIBIDO': 2 },
-                    inventario: [
-                        { id: 1, nombre: 'NECTAR YGGDRASIL', tipo: 'consumible', cantidad: 3, equipado: false },
-                        { id: 2, nombre: 'ESPADA HIERRO', tipo: 'equipo', cantidad: 1, equipado: true },
-                        { id: 3, nombre: 'POCIÓN VIDA', tipo: 'consumible', cantidad: 5, equipado: false }
-                    ]
-                };
+            if (!personajeActivo) {
+                window.location.href = 'login.html';
+                return;
             }
 
+            const { nombre } = JSON.parse(personajeActivo);
+
+            try {
+                // Cargar datos del personaje
+                const { data: personajeData, error: personajeError } = await supabase
+                    .from('personajes')
+                    .select('*')
+                    .eq('nombre', nombre)
+                    .single();
+
+                if (personajeError || !personajeData) {
+                    console.error('Error cargando personaje:', personajeError);
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                personaje = personajeData;
+
+                // Cargar inventario del personaje
+                const { data: inventarioData, error: inventarioError } = await supabase
+                    .from('inventario')
+                    .select('*')
+                    .eq('personaje_id', personaje.id);
+
+                if (!inventarioError && inventarioData) {
+                    inventarioItems = inventarioData;
+                }
+
+                // Renderizar todo
+                renderizarPersonaje();
+
+            } catch (error) {
+                console.error('Error:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        // ===== RENDERIZAR PERSONAJE =====
+        function renderizarPersonaje() {
             // Mostrar imagen si existe
-            if (personaje.imagen) {
-                document.getElementById('imagen-personaje').innerHTML = `<img src="${personaje.imagen}">`;
+            if (personaje.imagen_url) {
+                document.getElementById('imagen-personaje').innerHTML = `<img src="${personaje.imagen_url}">`;
             }
 
             // Mostrar datos básicos
             document.getElementById('datos-basicos').innerHTML = `
-                <div class="dato-item"><div class="dato-label">NOMBRE</div><div class="dato-valor">${personaje.nombre}</div></div>
-                <div class="dato-item"><div class="dato-label">RAZA</div><div class="dato-valor">${personaje.raza}</div></div>
-                <div class="dato-item"><div class="dato-label">RANGO</div><div class="dato-valor">${personaje.rango}</div></div>
-                <div class="dato-item"><div class="dato-label">EDAD</div><div class="dato-valor">${personaje.edad}</div></div>
-                <div class="dato-item"><div class="dato-label">GÉNERO</div><div class="dato-valor">${personaje.genero}</div></div>
-                <div class="dato-item"><div class="dato-label">ALTURA</div><div class="dato-valor">${personaje.altura}</div></div>
+                <div class="dato-item"><div class="dato-label">NOMBRE</div><div class="dato-valor">${personaje.nombre || '---'}</div></div>
+                <div class="dato-item"><div class="dato-label">RAZA</div><div class="dato-valor">${personaje.raza || '---'}</div></div>
+                <div class="dato-item"><div class="dato-label">RANGO</div><div class="dato-valor">${personaje.rango || '---'}</div></div>
+                <div class="dato-item"><div class="dato-label">EDAD</div><div class="dato-valor">${personaje.edad || '---'}</div></div>
+                <div class="dato-item"><div class="dato-label">GÉNERO</div><div class="dato-valor">${personaje.genero || '---'}</div></div>
+                <div class="dato-item"><div class="dato-label">ALTURA</div><div class="dato-valor">${personaje.altura || '---'}</div></div>
             `;
 
-            // Mostrar barras
+            // Mostrar barras (si tienes estos campos en Supabase)
+            // Si no los tienes, puedes calcularlos con las habilidades
+            const fuerza = personaje.fuerza || 100;
+            const magia = personaje.magia || 100;
+            const esencia = personaje.esencia || 100;
+            const vida = personaje.vida || 100;
+            const vidaMax = personaje.vida || 100;
+
             document.getElementById('barras-container').innerHTML = `
                 <div class="barra-item">
-                    <div class="barra-header"><span>FUERZA</span><span>${personaje.stats.fuerza}</span></div>
-                    <div class="barra-contenedor"><div class="barra-llenado barra-fuerza" style="width: ${personaje.stats.fuerza/2}%"></div></div>
+                    <div class="barra-header"><span>FUERZA</span><span>${fuerza}</span></div>
+                    <div class="barra-contenedor"><div class="barra-llenado barra-fuerza" style="width: ${fuerza/2}%"></div></div>
                 </div>
                 <div class="barra-item">
-                    <div class="barra-header"><span>MAGIA</span><span>${personaje.stats.magia}</span></div>
-                    <div class="barra-contenedor"><div class="barra-llenado barra-magia" style="width: ${personaje.stats.magia/2}%"></div></div>
+                    <div class="barra-header"><span>MAGIA</span><span>${magia}</span></div>
+                    <div class="barra-contenedor"><div class="barra-llenado barra-magia" style="width: ${magia/2}%"></div></div>
                 </div>
                 <div class="barra-item">
-                    <div class="barra-header"><span>ESENCIA</span><span>${personaje.stats.esencia}</span></div>
-                    <div class="barra-contenedor"><div class="barra-llenado barra-esencia" style="width: ${personaje.stats.esencia/2}%"></div></div>
+                    <div class="barra-header"><span>ESENCIA</span><span>${esencia}</span></div>
+                    <div class="barra-contenedor"><div class="barra-llenado barra-esencia" style="width: ${esencia/2}%"></div></div>
                 </div>
                 <div class="barra-item">
-                    <div class="barra-header"><span>VIDA</span><span>${personaje.stats.vida}/${personaje.stats.vidaMax}</span></div>
-                    <div class="barra-contenedor"><div class="barra-llenado barra-vida" style="width: ${(personaje.stats.vida/personaje.stats.vidaMax)*100}%"></div></div>
+                    <div class="barra-header"><span>VIDA</span><span>${vida}/${vidaMax}</span></div>
+                    <div class="barra-contenedor"><div class="barra-llenado barra-vida" style="width: ${(vida/vidaMax)*100}%"></div></div>
                 </div>
             `;
 
-            // Mostrar habilidades
-            mostrarAtributos('habilidades-container', personaje.habilidades);
-            mostrarAtributos('cuerpo-container', personaje.cuerpo);
-            mostrarAtributos('mente-container', personaje.mente);
-            mostrarAtributos('social-container', personaje.social);
+            // Mostrar habilidades (vienen como JSON en Supabase)
+            if (personaje.habilidades) {
+                mostrarAtributos('habilidades-container', personaje.habilidades);
+            }
+
+            if (personaje.cuerpo) {
+                mostrarAtributos('cuerpo-container', personaje.cuerpo);
+            }
+
+            if (personaje.mente) {
+                mostrarAtributos('mente-container', personaje.mente);
+            }
+
+            if (personaje.social) {
+                mostrarAtributos('social-container', personaje.social);
+            }
+
+            // Renderizar inventario
+            renderizarInventario();
         }
 
         function mostrarAtributos(containerId, datos) {
             const container = document.getElementById(containerId);
+            if (!container) return;
+            
             let html = '';
             
             Object.entries(datos).forEach(([nombre, valor]) => {
@@ -514,20 +561,20 @@
         // ===== INVENTARIO =====
         function renderizarInventario() {
             const container = document.getElementById('inventario-container');
-            const equipados = personaje.inventario.filter(o => o.equipado).length;
+            const equipados = inventarioItems.filter(o => o.equipado).length;
             document.getElementById('equipados-count').textContent = `${equipados}/3`;
 
             let html = '<div class="inventario-grid">';
             
-            personaje.inventario.forEach(item => {
+            inventarioItems.forEach(item => {
                 const claseExtra = item.equipado ? 'equipado' : '';
                 html += `<button class="objeto-btn ${claseExtra}" onclick="abrirModal(${item.id})">`;
-                html += `<div style="font-size:0.5rem; margin-bottom:5px;">${item.nombre}</div>`;
-                html += `<div style="font-size:0.4rem; color:#ffff66;">x${item.cantidad}</div>`;
+                html += `<div style="font-size:0.5rem; margin-bottom:5px;">${item.nombre || 'Objeto'}</div>`;
+                html += `<div style="font-size:0.4rem; color:#ffff66;">x${item.cantidad || 1}</div>`;
                 html += `</button>`;
             });
 
-            for (let i = personaje.inventario.length; i < 3; i++) {
+            for (let i = inventarioItems.length; i < 3; i++) {
                 html += `<div class="vacio-btn">VACÍO</div>`;
             }
             
@@ -537,10 +584,10 @@
 
         // ===== MODAL =====
         window.abrirModal = function(id) {
-            const item = personaje.inventario.find(i => i.id === id);
+            const item = inventarioItems.find(i => i.id === id);
             if (!item) return;
 
-            document.getElementById('modal-texto').textContent = item.nombre;
+            document.getElementById('modal-texto').textContent = item.nombre || 'Objeto';
             
             let botones = '';
             if (item.tipo === 'consumible') {
@@ -563,9 +610,9 @@
             document.getElementById('modal').style.display = 'none';
         };
 
-        window.equiparItem = function(id) {
-            const item = personaje.inventario.find(i => i.id === id);
-            const equipados = personaje.inventario.filter(o => o.equipado).length;
+        window.equiparItem = async function(id) {
+            const item = inventarioItems.find(i => i.id === id);
+            const equipados = inventarioItems.filter(o => o.equipado).length;
             
             if (equipados >= 3) {
                 alert('* Solo puedes equipar 3 objetos');
@@ -573,24 +620,60 @@
                 return;
             }
             
-            item.equipado = true;
-            renderizarInventario();
-            cerrarModal();
-        };
-
-        window.quitarItem = function(id) {
-            const item = personaje.inventario.find(i => i.id === id);
-            item.equipado = false;
-            renderizarInventario();
-            cerrarModal();
-        };
-
-        window.usarItem = function(id) {
-            const item = personaje.inventario.find(i => i.id === id);
-            item.cantidad--;
+            // Actualizar en Supabase
+            const { error } = await supabase
+                .from('inventario')
+                .update({ equipado: true })
+                .eq('id', id);
             
-            if (item.cantidad === 0) {
-                personaje.inventario = personaje.inventario.filter(i => i.id !== id);
+            if (!error) {
+                item.equipado = true;
+                renderizarInventario();
+            }
+            
+            cerrarModal();
+        };
+
+        window.quitarItem = async function(id) {
+            const item = inventarioItems.find(i => i.id === id);
+            
+            // Actualizar en Supabase
+            const { error } = await supabase
+                .from('inventario')
+                .update({ equipado: false })
+                .eq('id', id);
+            
+            if (!error) {
+                item.equipado = false;
+                renderizarInventario();
+            }
+            
+            cerrarModal();
+        };
+
+        window.usarItem = async function(id) {
+            const item = inventarioItems.find(i => i.id === id);
+            
+            if (item.cantidad <= 1) {
+                // Eliminar si es el último
+                const { error } = await supabase
+                    .from('inventario')
+                    .delete()
+                    .eq('id', id);
+                
+                if (!error) {
+                    inventarioItems = inventarioItems.filter(i => i.id !== id);
+                }
+            } else {
+                // Reducir cantidad
+                const { error } = await supabase
+                    .from('inventario')
+                    .update({ cantidad: item.cantidad - 1 })
+                    .eq('id', id);
+                
+                if (!error) {
+                    item.cantidad--;
+                }
             }
             
             renderizarInventario();
@@ -599,7 +682,6 @@
 
         // INICIALIZAR
         cargarPersonaje();
-        renderizarInventario();
     </script>
 </body>
 </html>
