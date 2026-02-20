@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÍGNEO - ACCESO AL PERSONAJE</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -241,6 +242,11 @@
     </div>
 
     <script>
+        // ===== CONEXIÓN A SUPABASE =====
+        const SUPABASE_URL = 'https://iwqeikrjhyqxyduvhhkg.supabase.co';
+        const SUPABASE_KEY = 'unsrhffwguwfebhppptz';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         // GENERAR ESTRELLAS
         for (let i = 0; i < 150; i++) {
             const estrella = document.createElement('div');
@@ -251,15 +257,6 @@
             document.getElementById('estrellas').appendChild(estrella);
         }
 
-        // ===== PERSONAJES APROBADOS (SIMULACIÓN) =====
-        const personajesAprobados = {
-            'KAELEN': { rango: 'RANGO IV: ÉLITE/PROTECTOR', llave: 'FEN-123-RIX' },
-            'LUMINA': { rango: 'RANGO V: CIUDADANO/GUERRERO', llave: 'LUM-456-HAD' },
-            'DRAKTHAR': { rango: 'RANGO IV: ÉLITE/PROTECTOR', llave: 'DRA-789-KIN' },
-            'ELARA': { rango: 'RANGO VI: COMÚN/SIRVIENTE', llave: 'ELA-321-SIR' },
-            'THORN': { rango: 'RANGO III: NOBLEZA/GOBIERNO', llave: 'THO-654-NOB' }
-        };
-
         // ===== FUNCIÓN PARA MOSTRAR MENSAJES =====
         function mostrarMensaje(texto, tipo) {
             const mensaje = document.createElement('div');
@@ -269,52 +266,60 @@
             setTimeout(() => mensaje.remove(), 3000);
         }
 
-        // ===== VALIDAR ACCESO =====
-        function validarAcceso() {
-            const nombre = document.getElementById('nombrePersonaje').value.trim().toUpperCase();
+        // ===== VALIDAR ACCESO CON SUPABASE =====
+        async function validarAcceso() {
+            const nombre = document.getElementById('nombrePersonaje').value.trim();
             const rango = document.getElementById('rango').value;
             const llave = document.getElementById('llaveUnica').value.trim();
 
             // VALIDAR CAMPOS VACÍOS
             if (!nombre || !rango || !llave) {
                 mostrarMensaje('* COMPLETA TODOS LOS CAMPOS', 'error');
-                return false;
+                return;
             }
 
-            // BUSCAR PERSONAJE
-            const personaje = personajesAprobados[nombre];
+            try {
+                // BUSCAR PERSONAJE EN SUPABASE
+                const { data, error } = await supabase
+                    .from('personajes')
+                    .select('*')
+                    .eq('nombre', nombre)
+                    .eq('rango', rango)
+                    .eq('llave_unica', llave)
+                    .eq('estado', 'aprobado')
+                    .maybeSingle();
 
-            if (!personaje) {
-                mostrarMensaje('* PERSONAJE NO ENCONTRADO', 'error');
-                return false;
+                if (error) {
+                    console.error('Error de Supabase:', error);
+                    mostrarMensaje('* ERROR DE CONEXIÓN', 'error');
+                    return;
+                }
+
+                if (!data) {
+                    mostrarMensaje('* CREDENCIALES INCORRECTAS', 'error');
+                    return;
+                }
+
+                // ACCESO EXITOSO
+                mostrarMensaje(`* BIENVENIDO, ${nombre}`, 'exito');
+                
+                // GUARDAR SESIÓN
+                localStorage.setItem('personajeActivo', JSON.stringify({
+                    id: data.id,
+                    nombre: data.nombre,
+                    rango: data.rango,
+                    llave: data.llave_unica
+                }));
+
+                // REDIRIGIR AL MENÚ DESBLOQUEADO
+                setTimeout(() => {
+                    window.location.href = 'menu-desbloqueado.html';
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('* ERROR INESPERADO', 'error');
             }
-
-            if (personaje.rango !== rango) {
-                mostrarMensaje('* RANGO INCORRECTO', 'error');
-                return false;
-            }
-
-            if (personaje.llave !== llave) {
-                mostrarMensaje('* LLAVE INCORRECTA', 'error');
-                return false;
-            }
-
-            // ACCESO EXITOSO
-            mostrarMensaje(`* BIENVENIDO, ${nombre}`, 'exito');
-            
-            // GUARDAR SESIÓN (SIMULADO)
-            localStorage.setItem('personajeActivo', JSON.stringify({
-                nombre: nombre,
-                rango: rango,
-                llave: llave
-            }));
-
-            // REDIRIGIR AL MENÚ DESBLOQUEADO
-            setTimeout(() => {
-                window.location.href = 'menu-desbloqueado.html';
-            }, 1500);
-
-            return true;
         }
 
         // ===== EVENTO DEL BOTÓN =====
